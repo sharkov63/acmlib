@@ -1,56 +1,6 @@
 
-const int MOD = 998244353;
-struct PrimeField {
-    int r;
-
-    PrimeField(): r(0) {}
-    PrimeField(ll x) {
-        r = x % MOD;
-        if (r < 0)
-            r += MOD;
-    }
-    PrimeField(const PrimeField& oth): r(oth.r) {}
-
-    PrimeField operator - () {
-        return PrimeField(-r);
-    }
-    PrimeField& operator += (const PrimeField& oth) {
-        if ((r += oth.r) >= MOD)
-            r -= MOD;
-        return *this;
-    }
-    PrimeField& operator -= (const PrimeField& oth) {
-        if ((r -= oth.r) < 0)
-            r += MOD;
-        return *this;
-    }
-    PrimeField& operator *= (const PrimeField& oth) {
-        r = r * (ll)oth.r % MOD;
-        return *this;
-    }
-};
-ostream& operator << (ostream& stream, const PrimeField& a) {
-    return stream << a.r;
-}
-PrimeField operator + (const PrimeField& lhs, const PrimeField& rhs) { return PrimeField(lhs) += rhs; }
-PrimeField operator - (const PrimeField& lhs, const PrimeField& rhs) { return PrimeField(lhs) -= rhs; }
-PrimeField operator * (const PrimeField& lhs, const PrimeField& rhs) { return PrimeField(lhs) *= rhs; }
-bool operator == (const PrimeField& lhs, const PrimeField& rhs) { return lhs.r == rhs.r; }
-bool operator != (const PrimeField& lhs, const PrimeField& rhs) { return lhs.r != rhs.r; }
-PrimeField bpow(PrimeField a, ll b) {
-    PrimeField res = 1;
-    for (; b; b >>= 1, a *= a)
-        if (b & 1)
-            res *= a;
-    return res;
-}
-PrimeField inv(PrimeField a) {
-    return bpow(a, MOD - 2);
-}
-
-
 struct PowerSeries {
-    vector<PrimeField> f;
+    vector<ModField> f;
 
     void remove_trailing_zeroes() {
         while (!f.empty() && f.back() == 0)
@@ -58,15 +8,15 @@ struct PowerSeries {
     }
 
     PowerSeries() {}
-    PowerSeries(PrimeField x) {
+    PowerSeries(ModField x) {
         f = {x};
         remove_trailing_zeroes();
     }
-    PowerSeries(vector<PrimeField> v) {
+    PowerSeries(vector<ModField> v) {
         f = v;
         remove_trailing_zeroes();
     }
-    PowerSeries(const PowerSeries& oth): f(vector<PrimeField>(oth.f)) {}
+    PowerSeries(const PowerSeries& oth): f(vector<ModField>(oth.f)) {}
 
     PowerSeries& trim(int n) {
         while ((int)f.size() > n)
@@ -74,10 +24,10 @@ struct PowerSeries {
         return *this;
     }
 
-    PrimeField coef(int i) {
+    ModField coef(int i) {
         return i < (int)f.size() ? f[i] : 0;
     }
-    PrimeField& operator [] (int i) {
+    ModField& operator [] (int i) {
         return f[i];
     }
 
@@ -102,7 +52,7 @@ struct PowerSeries {
         for (auto& x : res.f) x = -x;
         return res;
     }
-    PowerSeries& operator *= (PrimeField k) {
+    PowerSeries& operator *= (ModField k) {
         if (k == 0) {
             f.clear();
             return *this;
@@ -115,8 +65,8 @@ struct PowerSeries {
 const PowerSeries UNIT(1);
 PowerSeries operator + (const PowerSeries& lhs, const PowerSeries& rhs) { return PowerSeries(lhs) += rhs; }
 PowerSeries operator - (const PowerSeries& lhs, const PowerSeries& rhs) { return PowerSeries(lhs) -= rhs; }
-PowerSeries operator * (const PowerSeries& lhs, PrimeField k) { return PowerSeries(lhs) *= k; }
-PowerSeries operator * (PrimeField k, const PowerSeries& lhs) { return PowerSeries(lhs) *= k; }
+PowerSeries operator * (const PowerSeries& lhs, ModField k) { return PowerSeries(lhs) *= k; }
+PowerSeries operator * (ModField k, const PowerSeries& lhs) { return PowerSeries(lhs) *= k; }
 ostream& operator << (ostream& stream, const PowerSeries& A) {
     return stream << A.f;
 }
@@ -124,8 +74,8 @@ ostream& operator << (ostream& stream, const PowerSeries& A) {
 namespace fft {
     const int logN = 19;
     const int N = 1 << logN;
-    PrimeField invN;
-    PrimeField w[N];
+    ModField invN;
+    ModField w[N];
     int brev[N];
 
     pii getSz(int need) {
@@ -145,7 +95,7 @@ namespace fft {
         invN = inv(N);
     }
 
-    void fft(vector<PrimeField>& a, int k, int n) {
+    void fft(vector<ModField>& a, int k, int n) {
         for (int i = 0; i < n; ++i) {
             int j = brev[i] >> (logN - k);
             if (i < j)
@@ -164,15 +114,15 @@ namespace fft {
         }
     }
 
-    void reverse_fft(vector<PrimeField>& a, int k, int n) {
+    void reverse_fft(vector<ModField>& a, int k, int n) {
         fft(a, k, n);
         reverse(a.begin() + 1, a.end());
-        PrimeField inv_n = inv(n);
+        ModField inv_n = inv(n);
         for (auto& x : a)
             x *= inv_n;
     }
 
-    vector<PrimeField> mul(vector<PrimeField> a, vector<PrimeField> b) {
+    vector<ModField> mul(vector<ModField> a, vector<ModField> b) {
         if (a.empty() || b.empty()) return {};
         int need = a.size() + b.size() - 1;
         auto [k, n] = getSz(need);
@@ -187,7 +137,7 @@ namespace fft {
         return a;
     }
 
-    vector<PrimeField> square(vector<PrimeField> a) {
+    vector<ModField> square(vector<ModField> a) {
         if (a.empty()) return {};
         int need = 2 * a.size() - 1;
         auto [k, n] = getSz(need);
@@ -200,7 +150,7 @@ namespace fft {
         return a;
     }
 
-    vector<PrimeField> squareFirstTimesSecond(vector<PrimeField> a, vector<PrimeField> b) {
+    vector<ModField> squareFirstTimesSecond(vector<ModField> a, vector<ModField> b) {
         if (a.empty() || b.empty()) return {};
         int need = 2 * a.size() + b.size() - 2;
         auto [k, n] = getSz(need);
@@ -252,3 +202,4 @@ PowerSeries sqrt_first_unit(PowerSeries A, int sz) { // A[0] == 1
 void __precalc() {
     fft::init();
 }
+
