@@ -27,11 +27,11 @@ struct PowerSeries {
     ModField coef(int i) {
         return i < (int)f.size() ? f[i] : 0;
     }
-    ModField& operator [] (int i) {
+    ModField& operator[](int i) {
         return f[i];
     }
 
-    PowerSeries& operator += (const PowerSeries& oth) {
+    PowerSeries& operator+=(const PowerSeries& oth) {
         if (f.size() < oth.f.size())
             f.resize(oth.f.size());
         for (int i = 0; i < (int)oth.f.size(); ++i)
@@ -39,7 +39,7 @@ struct PowerSeries {
         remove_trailing_zeroes();
         return *this;
     }
-    PowerSeries& operator -= (const PowerSeries& oth) {
+    PowerSeries& operator-=(const PowerSeries& oth) {
         if (f.size() < oth.f.size())
             f.resize(oth.f.size());
         for (int i = 0; i < (int)oth.f.size(); ++i)
@@ -47,12 +47,12 @@ struct PowerSeries {
         remove_trailing_zeroes();
         return *this;
     }
-    PowerSeries operator - () {
+    PowerSeries operator-() {
         auto res = PowerSeries(*this);
         for (auto& x : res.f) x = -x;
         return res;
     }
-    PowerSeries& operator *= (ModField k) {
+    PowerSeries& operator*=(ModField k) {
         if (k == 0) {
             f.clear();
             return *this;
@@ -63,11 +63,11 @@ struct PowerSeries {
     }
 };
 const PowerSeries UNIT(1);
-PowerSeries operator + (const PowerSeries& lhs, const PowerSeries& rhs) { return PowerSeries(lhs) += rhs; }
-PowerSeries operator - (const PowerSeries& lhs, const PowerSeries& rhs) { return PowerSeries(lhs) -= rhs; }
-PowerSeries operator * (const PowerSeries& lhs, ModField k) { return PowerSeries(lhs) *= k; }
-PowerSeries operator * (ModField k, const PowerSeries& lhs) { return PowerSeries(lhs) *= k; }
-ostream& operator << (ostream& stream, const PowerSeries& A) {
+PowerSeries operator+(const PowerSeries& lhs, const PowerSeries& rhs) { return PowerSeries(lhs) += rhs; }
+PowerSeries operator-(const PowerSeries& lhs, const PowerSeries& rhs) { return PowerSeries(lhs) -= rhs; }
+PowerSeries operator*(const PowerSeries& lhs, ModField k) { return PowerSeries(lhs) *= k; }
+PowerSeries operator*(ModField k, const PowerSeries& lhs) { return PowerSeries(lhs) *= k; }
+ostream& operator<<(ostream& stream, const PowerSeries& A) {
     return stream << A.f;
 }
 
@@ -165,7 +165,7 @@ namespace fft {
         return a;
     }
 }
-PowerSeries operator * (const PowerSeries& A, const PowerSeries& B) {
+PowerSeries operator*(const PowerSeries& A, const PowerSeries& B) {
     return PowerSeries(fft::mul(A.f, B.f));
 }
 

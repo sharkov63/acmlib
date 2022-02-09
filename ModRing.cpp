@@ -1,8 +1,8 @@
 /**
- * Ring modulo a static int.
+ * Ring modulo a static int32_t.
  */
 struct ModRing {
-    static int mod;
+    static int32_t mod;
 
     static ll inverse(ll a) {
         ll m = mod;
@@ -16,7 +16,7 @@ struct ModRing {
         return um;
     }
 
-    int r;
+    int32_t r;
 
     ModRing(): r(0) {}
     ModRing(ll x) {
@@ -26,69 +26,72 @@ struct ModRing {
     }
     ModRing(const ModRing& oth): r(oth.r) {}
 
-    ModRing& operator = (const ModRing& oth) {
+    ModRing& operator=(const ModRing& oth) {
         r = oth.r;
         return *this;
     }
 
-    ModRing& operator += (const ModRing& oth) {
+    ModRing& operator+=(const ModRing& oth) {
         if ((r += oth.r) >= mod)
             r -= mod;
         return *this;
     }
-    ModRing& operator -= (const ModRing& oth) {
+    ModRing& operator-=(const ModRing& oth) {
         if ((r -= oth.r) < 0)
             r += mod;
         return *this;
     }
-    ModRing operator - () const {
+    ModRing operator-() const {
         return ModRing(-r);
     }
-    ModRing& operator ++ () {
+    ModRing& operator++() {
         return *this += 1;
     }
-    ModRing& operator -- () {
+    ModRing& operator--() {
         return *this -= 1;
     }
-    ModRing operator ++ (int32_t) const {
+    ModRing operator++(int32_t) const {
         return ++ModRing(*this);
     }
-    ModRing operator -- (int32_t) const {
+    ModRing operator--(int32_t) const {
         return --ModRing(*this);
     }
 
-    bool operator == (const ModRing& oth) const {
+    bool operator==(const ModRing& oth) const {
         return r == oth.r;
     }
-    bool operator != (const ModRing& oth) const {
+    bool operator!=(const ModRing& oth) const {
         return r != oth.r;
     }
-    bool operator < (const ModRing& oth) const {
+    bool operator<(const ModRing& oth) const {
         return r < oth.r;
     }
 
-    ModRing& operator *= (const ModRing& oth) {
+    ModRing& operator*=(const ModRing& oth) {
         r = r * (ll)oth.r % mod;
         return *this;
     }
-    ModRing& operator /= (const ModRing& oth) {
-        return *this *= ModRing(inverse(oth.r));
+    ModRing& operator/=(const ModRing& oth) {
+        int32_t g = gcd(r, oth.r);
+        r /= g;
+        int32_t b = oth.r / g;
+        return *this *= ModRing(inverse(b));
     }
 };
-int ModRing::mod;
-ostream& operator << (ostream& stream, const ModRing& a) {
+int32_t ModRing::mod;
+ostream& operator<<(ostream& stream, const ModRing& a) {
     return stream << a.r;
 }
-istream& operator >> (istream& stream, ModRing& a) {
+istream& operator>>(istream& stream, ModRing& a) {
     ll x;
     stream >> x;
     a = ModRing(x);
     return stream;
 }
-ModRing operator + (const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) += rhs; }
-ModRing operator - (const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) -= rhs; }
-ModRing operator * (const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) *= rhs; }
-ModRing operator / (const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) /= rhs; }
+ModRing operator+(const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) += rhs; }
+ModRing operator-(const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) -= rhs; }
+ModRing operator*(const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) *= rhs; }
+ModRing operator/(const ModRing& lhs, const ModRing& rhs) { return ModRing(lhs) /= rhs; }
 ModRing bpow(ModRing a, ll b) {
     ModRing res = 1;
     for (; b; b >>= 1, a *= a)

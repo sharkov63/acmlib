@@ -2,7 +2,7 @@
  * Field modulo a constant prime number.
  */
 struct ModField {
-    static const int mod = 998244353;
+    static const int32_t mod = 998244353;
 
     static ll inverse(ll a) {
         ll m = mod;
@@ -16,7 +16,7 @@ struct ModField {
         return um;
     }
 
-    int r;
+    int32_t r;
 
     ModField(): r(0) {}
     ModField(ll x) {
@@ -26,68 +26,68 @@ struct ModField {
     }
     ModField(const ModField& oth): r(oth.r) {}
 
-    ModField& operator = (const ModField& oth) {
+    ModField& operator=(const ModField& oth) {
         r = oth.r;
         return *this;
     }
 
-    ModField& operator += (const ModField& oth) {
+    ModField& operator+=(const ModField& oth) {
         if ((r += oth.r) >= mod)
             r -= mod;
         return *this;
     }
-    ModField& operator -= (const ModField& oth) {
+    ModField& operator-=(const ModField& oth) {
         if ((r -= oth.r) < 0)
             r += mod;
         return *this;
     }
-    ModField operator - () const {
+    ModField operator-() const {
         return ModField(-r);
     }
-    ModField& operator ++ () {
+    ModField& operator++() {
         return *this += 1;
     }
-    ModField& operator -- () {
+    ModField& operator--() {
         return *this -= 1;
     }
-    ModField operator ++ (int32_t) const {
+    ModField operator++(int32_t) const {
         return ++ModField(*this);
     }
-    ModField operator -- (int32_t) const {
+    ModField operator--(int32_t) const {
         return --ModField(*this);
     }
 
-    bool operator == (const ModField& oth) const {
+    bool operator==(const ModField& oth) const {
         return r == oth.r;
     }
-    bool operator != (const ModField& oth) const {
+    bool operator!=(const ModField& oth) const {
         return r != oth.r;
     }
-    bool operator < (const ModField& oth) const {
+    bool operator<(const ModField& oth) const {
         return r < oth.r;
     }
 
-    ModField& operator *= (const ModField& oth) {
+    ModField& operator*=(const ModField& oth) {
         r = r * (ll)oth.r % mod;
         return *this;
     }
-    ModField& operator /= (const ModField& oth) {
+    ModField& operator/=(const ModField& oth) {
         return *this *= ModField(inverse(oth.r));
     }
 };
-ostream& operator << (ostream& stream, const ModField& a) {
+ostream& operator<<(ostream& stream, const ModField& a) {
     return stream << a.r;
 }
-istream& operator >> (istream& stream, ModField& a) {
+istream& operator>>(istream& stream, ModField& a) {
     ll x;
     stream >> x;
     a = ModField(x);
     return stream;
 }
-ModField operator + (const ModField& lhs, const ModField& rhs) { return ModField(lhs) += rhs; }
-ModField operator - (const ModField& lhs, const ModField& rhs) { return ModField(lhs) -= rhs; }
-ModField operator * (const ModField& lhs, const ModField& rhs) { return ModField(lhs) *= rhs; }
-ModField operator / (const ModField& lhs, const ModField& rhs) { return ModField(lhs) /= rhs; }
+ModField operator+(const ModField& lhs, const ModField& rhs) { return ModField(lhs) += rhs; }
+ModField operator-(const ModField& lhs, const ModField& rhs) { return ModField(lhs) -= rhs; }
+ModField operator*(const ModField& lhs, const ModField& rhs) { return ModField(lhs) *= rhs; }
+ModField operator/(const ModField& lhs, const ModField& rhs) { return ModField(lhs) /= rhs; }
 ModField bpow(ModField a, ll b) {
     ModField res = 1;
     for (; b; b >>= 1, a *= a)
