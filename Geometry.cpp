@@ -10,12 +10,12 @@ public:
 
     /* Constructors */
 
-    Vector2<T>() {}                                                              
-    Vector2<T>(const T& _x, const T& _y): x(_x), y(_y) {}                         
-    Vector2<T>(const Vector2<T>& other): x(other.x), y(other.y) {}                    
-    template<typename U> Vector2<T>(const Vector2<U>& other): x((T)other.x), y((T)other.y) {}                    
-    Vector2<T>(const Point2<T>& A, const Point2<T>& B): x(B.x - A.x), y(B.y - A.y) {}     
-    ~Vector2<T>() {}                                                              
+    Vector2() {}                                                              
+    Vector2(const T& _x, const T& _y): x(_x), y(_y) {}                         
+    Vector2(const Vector2<T>& other): x(other.x), y(other.y) {}                    
+    template<typename U> Vector2(const Vector2<U>& other): x((T)other.x), y((T)other.y) {}                    
+    Vector2(const Point2<T>& A, const Point2<T>& B): x(B.x - A.x), y(B.y - A.y) {}     
+    ~Vector2() {}                                                              
 
 
     /* Copy assignment */
@@ -198,11 +198,11 @@ private:
 
 public:
 
-    EpsReal<R>(): value(0) {}
-    EpsReal<R>(const R& _value): value(_value) {}
-    template<typename S> EpsReal<R>(const S& _value): value((R)_value) {}
-    EpsReal<R>(const EpsReal<R>& other): value(other.value) {}
-    template<typename S> EpsReal<R>(const EpsReal<S>& other): value((R)other.value) {}
+    EpsReal(): value(0) {}
+    EpsReal(const R& _value): value(_value) {}
+    template<typename S> EpsReal(const S& _value): value((R)_value) {}
+    EpsReal(const EpsReal<R>& other): value(other.value) {}
+    template<typename S> EpsReal(const EpsReal<S>& other): value((R)other.value) {}
 
     EpsReal<R>& operator=(const EpsReal<R>& other) {
         if (this == &other) return *this;
