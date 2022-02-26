@@ -1,177 +1,310 @@
+const long double PI = 4 * atan(1);
 
-#define Point Vector
-struct Vector {
-    ll x, y;
+#define Point2 Vector2
+template<typename T>
+class Vector2 {
+public:
 
-    Vector(ll _x = 0, ll _y = 0): x(_x), y(_y) {} // create by coordinates (default (0, 0))
-    Vector(const Vector& oth): x(oth.x), y(oth.y) {} // clone vector
-    Vector(const Point& A, const Point& B): x(B.x - A.x), y(B.y - A.y) {} // create by two endpoints
+    T x, y;
 
-    // addition
-    inline Vector& operator+=(const Vector& oth) {
-        x += oth.x;
-        y += oth.y;
+
+    /* Constructors */
+
+    Vector2<T>() {}                                                              
+    Vector2<T>(const T& _x, const T& _y): x(_x), y(_y) {}                         
+    Vector2<T>(const Vector2<T>& other): x(other.x), y(other.y) {}                    
+    template<typename U> Vector2<T>(const Vector2<U>& other): x((T)other.x), y((T)other.y) {}                    
+    Vector2<T>(const Point2<T>& A, const Point2<T>& B): x(B.x - A.x), y(B.y - A.y) {}     
+    ~Vector2<T>() {}                                                              
+
+
+    /* Copy assignment */
+
+    Vector2<T>& operator=(const Vector2<T>& other) {
+        if (this == &other) return *this;
+        x = other.x;
+        y = other.y;
         return *this;
     }
 
-    // subtraction
-    Vector& operator-=(const Vector& oth) {
-        x -= oth.x;
-        y -= oth.y;
+
+    /* Linear operations */
+
+    Vector2<T>& operator+=(const Vector2<T>& other) {
+        x += other.x;
+        y += other.y;
         return *this;
     }
-
-    // multiplication by a scalar
-    Vector& operator*=(ll k) {
-        x *= k;
-        y *= k;
+    Vector2<T> operator+(const Vector2<T>& other) const {
+        return Vector2<T>(*this) += other;
+    }
+    Vector2<T> operator+() const {
+        return Vector2<T>(*this);
+    }
+    Vector2<T>& operator-=(const Vector2<T>& other) {
+        x -= other.x;
+        y -= other.y;
         return *this;
     }
-
-    // division by a scalar
-    Vector& operator/=(ll k) {
-        x /= k;
-        y /= k;
+    Vector2<T> operator-(const Vector2<T>& other) const {
+        return Vector2<T>(*this) -= other;
+    }
+    Vector2<T> operator-() const {
+        return Vector2<T>(-x, -y);
+    }
+    template<typename U> Vector2<T>& operator*=(const U& k) {
+        T f = (T)k;
+        x *= f;
+        y *= f;
         return *this;
     }
-
-    // opposite vector
-    Vector operator-() const {
-        return Vector(-x, -y);
+    template<typename U> Vector2<T> operator*(const U& k) const {
+        return Vector2<T>(*this) *= k;
+    }
+    template<typename U> Vector2<T>& operator/=(const U& k) {
+        T f = (T)k;
+        x /= f;
+        y /= f;
+        return *this;
+    }
+    template<typename U> Vector2<T> operator/(const U& k) const {
+        return Vector2<T>(*this) /= k;
     }
 
-    // dot product
-    ll operator*(const Vector& oth) const {
-        return x * oth.x + y * oth.y;
+
+    /* Dot product */
+
+    T operator*(const Vector2<T>& other) const {
+        return x * other.x + y * other.y;
+    }
+    bool perpendicularTo(const Vector2<T>& other) const {
+        return (*this) * other == 0;
     }
 
-    // cross product
-    ll operator%(const Vector& oth) const {
-        return x * oth.y - y * oth.x;
+    /* Cross product */
+
+    T operator%(const Vector2<T>& other) const {
+        return x * other.y - y * other.x;
     }
 
-    // length squared
-    ll len2() {
+    /* vector[0] and vector[1] access */
+
+    T operator[](const int& i) const {
+        if (i == 0)
+            return x;
+        if (i == 1)
+            return y;
+        throw;
+    }
+    T& operator[](const int& i) {
+        if (i == 0)
+            return x;
+        if (i == 1)
+            return y;
+        throw;
+    }
+
+
+    /* Comparison */
+
+    bool operator==(const Vector2<T>& other) const {
+        return x == other.x && y == other.y;
+    }
+    bool operator!=(const Vector2<T>& other) const {
+        return x != other.x || y != other.y;
+    }
+    bool operator<(const Vector2<T>& other) const {
+        if (x != other.x)
+            return x < other.x;
+        return y < other.y;
+    }
+    bool operator<=(const Vector2<T>& other) const {
+        if (x != other.x)
+            return x <= other.x;
+        return y <= other.y;
+    }
+    bool operator>(const Vector2<T>& other) const {
+        if (x != other.x)
+            return x > other.x;
+        return y > other.y;
+    }
+    bool operator>=(const Vector2<T>& other) const {
+        if (x != other.x)
+            return x >= other.x;
+        return y >= other.y;
+    }
+    
+
+    /* Length */
+
+    T length2() const {
         return x * x + y * y;
     }
-
-    ld len() {
-        return sqrt(x * x + y * y);
+    long double length() const {
+        long double cx = (long double)x;
+        long double cy = (long double)y;
+        return sqrt(cx * cx + cy * cy);
+    }
+    template<typename R> Vector2<R> normalized() const {
+        return Vector2<R>(*this) /= length();
+    }
+    void normalize() {
+        (*this) /= length();
     }
 
-    bool operator==(const Vector& oth) const {
-        return x == oth.x && y == oth.y;
-    }
+    
+    /* Angles */
 
-    bool operator!=(const Vector& oth) const {
-        return x != oth.x || y != oth.y;
-    }
-
-    bool operator<(const Vector& oth) const {
-        return x < oth.x || (x == oth.x && y < oth.y);
-    }
-
-    bool parallel_to(const Vector& oth) const {
-        return (*this) % oth == 0;
+    /**
+     * Returns angle in [-PI; PI].
+     */
+    long double polar() const {
+        return atan2((long double)y, (long double)x);
     }
 };
-Vector operator+(const Vector& lhs, const Vector& rhs) { return Vector(lhs) += rhs; }
-Vector operator-(const Vector& lhs, const Vector& rhs) { return Vector(lhs) -= rhs; }
-Vector operator*(const Vector& lhs, ll rhs) { return Vector(lhs) *= rhs; }
-Vector operator*(ll lhs, const Vector& rhs) { return Vector(rhs) *= lhs; }
-Vector operator/(const Vector& lhs, ll rhs) { return Vector(lhs) /= rhs; }
-ostream& operator<<(ostream& stream, const Vector& v) {
+template<typename T, typename U> Vector2<T> operator*(const U& k, const Vector2<T>& v) {
+    return v * k;
+}
+
+template<typename T> ostream& operator<<(ostream& stream, const Vector2<T>& v) {
     return stream << v.x << ' ' << v.y;
 }
-istream& operator>>(istream& stream, Vector& v) {
+template<typename T> istream& operator>>(istream& stream, Vector2<T>& v) {
     return stream >> v.x >> v.y;
 }
 
-// double geometry
+template<typename T> T distance2(const Point2<T>& A, const Point2<T>& B) {
+    return (B - A).length2();
+}
+template<typename T> long double distance(const Point2<T>& A, const Point2<T>& B) {
+    return (B - A).length();
+}
 
-const double eps = 1e-9;
+/**
+ * Returns angle in [-PI; PI].
+ */
+template<typename T> long double polar(const Vector2<T>& u, const Vector2<T>& v) {
+    return atan2((long double)(u % v), (long double)(u * v));
+}
 
-#define DPoint DVector
-struct DVector {
-    ld x, y;
 
-    DVector(ld _x = 0, ld _y = 0): x(_x), y(_y) {} // create by coordinates (default (0, 0))
-    DVector(const DVector& oth): x(oth.x), y(oth.y) {} // clone vector
-    DVector(const Vector& oth): x(oth.x), y(oth.y) {}  // clone integer vector
-    DVector(const DPoint& A, const DPoint& B): x(B.x - A.x), y(B.y - A.y) {} // create by two endpoints
 
-    // addition
-    inline DVector& operator+=(const DVector& oth) {
-        x += oth.x;
-        y += oth.y;
+template<typename R>
+class EpsReal {
+private:
+    static constexpr R eps = 1e-9;
+
+    R value;
+
+public:
+
+    EpsReal<R>(): value(0) {}
+    EpsReal<R>(const R& _value): value(_value) {}
+    template<typename S> EpsReal<R>(const S& _value): value((R)_value) {}
+    EpsReal<R>(const EpsReal<R>& other): value(other.value) {}
+    template<typename S> EpsReal<R>(const EpsReal<S>& other): value((R)other.value) {}
+
+    EpsReal<R>& operator=(const EpsReal<R>& other) {
+        if (this == &other) return *this;
+        value = other.value;
         return *this;
     }
 
-    // subtraction
-    DVector& operator-=(const DVector& oth) {
-        x -= oth.x;
-        y -= oth.y;
+    EpsReal<R>& operator+=(const EpsReal<R>& other) {
+        value += other.value;
         return *this;
     }
-
-    // multiplication by a scalar
-    DVector& operator*=(ld k) {
-        x *= k;
-        y *= k;
+    EpsReal<R> operator+(const EpsReal<R>& other) const {
+        return EpsReal<R>(*this) += other;
+    }
+    EpsReal<R> operator+() const {
+        return EpsReal<R>(*this);
+    }
+    EpsReal<R>& operator-=(const EpsReal<R>& other) {
+        value -= other.value;
         return *this;
     }
-
-    // division by a scalar
-    DVector& operator/=(ld k) {
-        x /= k;
-        y /= k;
+    EpsReal<R> operator-(const EpsReal<R>& other) const {
+        return EpsReal<R>(*this) -= other;
+    }
+    EpsReal<R> operator-() const {
+        return EpsReal<R>(-value);
+    }
+    EpsReal<R>& operator*=(const EpsReal<R>& other) {
+        value *= other.value;
         return *this;
     }
-
-    // opposite vector
-    DVector operator-() const {
-        return DVector(-x, -y);
+    EpsReal<R> operator*(const EpsReal<R>& other) const {
+        return EpsReal<R>(*this) *= other;
+    }
+    EpsReal<R>& operator/=(const EpsReal<R>& other) {
+        value /= other.value;
+        return *this;
+    }
+    EpsReal<R> operator/(const EpsReal<R>& other) const {
+        return EpsReal<R>(*this) /= other;
     }
 
-    // dot product
-    ld operator*(const DVector& oth) const {
-        return x * oth.x + y * oth.y;
+    bool operator==(const EpsReal<R>& other) const {
+        return fabs(value - other.value) < eps;
+    }
+    bool operator!=(const EpsReal<R>& other) const {
+        return fabs(value - other.value) >= eps;
+    }
+    bool operator<(const EpsReal<R>& other) const {
+        return value <= other.value - eps;
+    }
+    bool operator>(const EpsReal<R>& other) const {
+        return value >= other.value + eps;
+    }
+    bool operator<=(const EpsReal<R>& other) const {
+        return value < other.value + eps;
+    }
+    bool operator>=(const EpsReal<R>& other) const {
+        return value > other.value - eps;
     }
 
-    // cross product
-    ld operator%(const DVector& oth) const {
-        return x * oth.y - y * oth.x;
+    R getValue() const {
+        return value; 
+    }
+    void setValue(const R& newValue) {
+        value = newValue;
     }
 
-    // length squared
-    ld len2() {
-        return x * x + y * y;
+    operator float() const {
+        return (float)value;
+    }
+    operator double() const {
+        return (double)value;
+    }
+    operator long double() const {
+        return (long double)value;
     }
 
-    ld len() {
-        return sqrt(x * x + y * y);
-    }
-
-    bool operator==(const DVector& oth) const {
-        return fabs(x - oth.x) < eps && fabs(y - oth.y) < eps;
-    }
-
-    bool operator!=(const DVector& oth) const {
-        return fabs(x - oth.x) >= eps || fabs(y - oth.y) > eps;
-    }
-
-    bool parallel_to(const DVector& oth) const {
-        return fabs((*this) % oth) < eps;
+    int sign() const {
+        if (fabs(value) < eps)
+            return 0;
+        if (value >= eps)
+            return +1;
+        return -1;
     }
 };
-DVector operator+(const DVector& lhs, const DVector& rhs) { return DVector(lhs) += rhs; }
-DVector operator-(const DVector& lhs, const DVector& rhs) { return DVector(lhs) -= rhs; }
-DVector operator*(const DVector& lhs, ld rhs) { return DVector(lhs) *= rhs; }
-DVector operator*(ld lhs, const DVector& rhs) { return DVector(rhs) *= lhs; }
-DVector operator/(const DVector& lhs, ld rhs) { return DVector(lhs) /= rhs; }
-ostream& operator<<(ostream& stream, const DVector& v) {
-    return stream << v.x << ' ' << v.y;
+template<typename R> ostream& operator<<(ostream& stream, const EpsReal<R>& real) {
+    return stream << real.getValue();
 }
-istream& operator>>(istream& stream, DVector& v) {
-    return stream >> v.x >> v.y;
+template<typename R> istream& operator>>(istream& stream, EpsReal<R>& real) {
+    R temp;
+    stream >> temp;
+    real.setValue(temp);
+    return stream;
 }
+
+typedef EpsReal<float> EpsFloat;
+typedef EpsReal<double> EpsDouble;
+typedef EpsReal<long double> EpsLongDouble;
+
+typedef Vector2<long long> Vector;
+typedef Point2<long long> Point;
+typedef Vector2<EpsFloat> FVector;
+typedef Vector2<EpsDouble> DVector;
+typedef Vector2<EpsLongDouble> LDVector;
