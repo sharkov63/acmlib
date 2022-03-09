@@ -13,7 +13,6 @@ public:
     EpsReal(const Real& _value): value(_value) {}
     template<typename T> EpsReal(const T& _value): value((Real)_value) {}
     EpsReal(const EpsReal& other): value(other.value) {}
-    template<typename T> EpsReal(const EpsReal& other): value((Real)other.value) {}
     ~EpsReal() {}
 
     EpsReal& operator=(const EpsReal& other) {
