@@ -1,9 +1,4 @@
-# Ignore all
-*
-# Unignore all with extensions
-!*.*
-# Unignore all dirs
-!*/
-# ABOVE combination will ignore all files without extension
-
-in
+test/build
+test/compile_commands.json
+test/neovim.json
+test/.cache/
