@@ -2,3 +2,4 @@ test/build
 test/compile_commands.json
 test/neovim.json
 test/.cache/
+test/.nvimrc
