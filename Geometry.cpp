@@ -145,32 +145,36 @@ int32_t sign(T x) {
     return -1;
 }
 
-template <typename T, typename Enable = void>
+template <typename T>
 class Vector2;
 
 template <typename T>
 using Point2 = Vector2<T>;
 
-// Encapsulates common functionality
-// of Vector2 template class specializations.
+using Vector = Vector2<int64_t>;
+using Point = Vector;
+using RVector = Vector2<Real>;
+using RPoint = RVector;
+
+// A 2-dimensional vector
+// with coordinates of type T.
 template <typename T>
-class Vector2Common {
+class Vector2 {
    public:
     // Default constructor: zero vector.
-    Vector2Common() : coords{0, 0} {}
+    Vector2<T>() : coords{0, 0} {}
 
     // Construct vector by coordinates.
     template <typename P, typename Q = P>
-    Vector2Common(P x, Q y = 0)
-        : coords{static_cast<T>(x), static_cast<T>(y)} {}
+    Vector2<T>(P x, Q y) : coords{static_cast<T>(x), static_cast<T>(y)} {}
 
     // Conversion between vectors with different coordinate types.
     template <typename P>
-    Vector2Common(Vector2<P> v)
+    Vector2<T>(Vector2<P> v)
         : coords{static_cast<T>(v.x()), static_cast<T>(v.y())} {}
 
     // Construct vector by two endpoints.
-    explicit Vector2Common(Point2<T> A, Point2<T> B)
+    explicit Vector2<T>(Point2<T> A, Point2<T> B)
         : coords{B.x() - A.x(), B.y() - A.y()} {}
 
     // Access to x and y coordinates.
@@ -265,16 +269,6 @@ class Vector2Common {
 
    private:
     std::array<T, 2> coords;
-
-    operator Vector2<T>() const { return {x(), y()}; }
-};
-
-// A 2-dimensional vector
-// with coordinates of type T.
-template <typename T, typename Enable>
-class Vector2 : public Vector2Common<T> {
-   public:
-    using Vector2Common<T>::Vector2Common;
 };
 
 // Squared euclidean distance between two points.
@@ -289,56 +283,34 @@ Real dist(Point2<T> A, Point2<T> B) {
     return (B - A).len();
 }
 
-// Specialization for integral cooridnate types (int, long long, etc.).
+RVector operator/(RVector lhs, Real rhs) {
+    return {lhs.x() / rhs, lhs.y() / rhs};
+}
+void operator/=(RVector& lhs, Real rhs) {
+    lhs.x() /= rhs;
+    lhs.y() /= rhs;
+}
+
+void normalize(RVector& v) {
+    Real l = v.len();
+    v /= l;
+}
+
+RVector normalized(RVector v) { return v / v.len(); }
 template <typename T>
-class Vector2<T, typename std::enable_if<std::is_integral<T>::value>::type>
-    : public Vector2Common<T> {
-   public:
-    using Vector2Common<T>::Vector2Common;
+typename std::enable_if<std::is_integral<T>::value, void>::type normalize(
+    Vector2<T>& v) {
+    auto g = std::gcd(v.x(), v.y());
+    if (!g) return;
+    if (v.x() < 0 || (v.x() == 0 && v.y() < 0)) g *= -1;
+    v.x() /= g;
+    v.y() /= g;
+}
 
-    // Scales the vector down, so that the coordinates are coprime,
-    // and takes
-    void normalize() {
-        auto g = std::gcd(this->x(), this->y());
-        if (!g) return;
-        if (this->x() < 0 || (this->x() == 0 && this->y() < 0)) g *= -1;
-        this->x() /= g;
-        this->y() /= g;
-    }
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value, Vector2<T>>::type
+normalized(Vector2<T> v) {
+    v.normalize();
+    return v;
+}
 
-    Vector2<T> normalized() const {
-        Vector2<T> copy(*this);
-        copy.normalize();
-        return copy;
-    }
-};
-using Vector = Vector2<int64_t>;
-using Point = Vector;
-
-template <typename Enable>
-class Vector2<Real, Enable> : public Vector2Common<Real> {
-   public:
-    using Vector2Common<Real>::Vector2Common;
-
-    // Scalar division
-
-    Vector2<Real> operator/(Real rhs) const { return {x() / rhs, y() / rhs}; }
-    void operator/=(Real k) {
-        x() /= k;
-        y() /= k;
-    }
-
-    // Normalization
-
-    void normalize() {
-        Real l = len();
-        *this /= l;
-    }
-
-    Vector2<Real> normalized() const {
-        Real l = len();
-        return {x() / l, y() / l};
-    }
-};
-using RVector = Vector2<Real>;
-using RPoint = RVector;

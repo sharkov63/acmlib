@@ -290,24 +290,6 @@ TEST_SUITE("Geometry::Vector2") {
         CHECK(v.coords[1] == 0);
     }
 
-    TEST_CASE("One parameter constructor") {
-        Vector2<int32_t> a(1);
-        CHECK(a.coords[0] == 1);
-        CHECK(a.coords[1] == 0);
-        RVector b{-3};
-        CHECK(b.coords[0] == -3);
-        CHECK(b.coords[1] == 0);
-        Vector2<float> c({12});
-        CHECK(c.coords[0] == Approx(12));
-        CHECK(c.coords[1] == Approx(0));
-        Vector2<double> d = {-0.2};
-        CHECK(d.coords[0] == Approx(-0.2));
-        CHECK(d.coords[1] == Approx(0));
-        RVector e = -11.1;
-        CHECK(e.coords[0] == -11.1);
-        CHECK(e.coords[1] == 0);
-    }
-
     TEST_CASE("Two parameter constructor") {
         Vector a(1, 2);
         CHECK(a.coords[0] == 1);
@@ -403,41 +385,40 @@ TEST_SUITE("Geometry::Vector2") {
     }
 
     TEST_CASE("Comparison") {
-        CHECK(Vector(3, 0) == 3);
-        CHECK(RVector(1e-12, 34.1) == Vector2<Real>(0, 34.1));
+        CHECK(RVector(1e-12, 34.1) == RVector(0, 34.1));
         CHECK(Vector2<float>(4.5, 3.0003) != Vector2<float>(4.5, 3));
         CHECK(Vector(1, 2) < Vector(3, -100000));
-        CHECK(RVector(0.1) <= Vector2<Real>(0.1, 0.1));
+        CHECK(RVector(0.1, 0) <= RVector(0.1, 0.1));
         CHECK(Vector(4, -1) >= Vector(4, -1));
         CHECK_FALSE(Vector(3, 0) < Vector(3, -1));
     }
 
     TEST_CASE("Vector addition") {
         CHECK(Vector(1, -1) + Vector(2, 3) == Vector(3, 2));
-        CHECK(RVector(99.1, 5) + 10 == Vector2<Real>(109.1, 5));
+        CHECK(RVector(99.1, 5) + RVector(10, 0) == RVector(109.1, 5));
         Vector a{4, 1};
-        CHECK(a + Vector(-4, -1) == 0);
+        CHECK(a + Vector(-4, -1) == RVector());
         CHECK(a == Vector(4, 1));
         a += {3, -2};
         CHECK(a == Vector(7, -1));
     }
 
     TEST_CASE("Vector subtraction") {
-        CHECK(RVector(0.1, -30) - Vector2<Real>(0.7, -31) == RVector(-0.6, 1));
-        CHECK(RVector(1.3) - 0.3 == 1);
+        CHECK(RVector(0.1, -30) - RVector(0.7, -31) == RVector(-0.6, 1));
+        CHECK(RVector(1.3, 0) - RVector(0.3, 0) == RVector(1, 0));
         Vector b{-10, -9};
         CHECK(b - Vector(-10, -8) == Vector(0, -1));
         CHECK(b == Vector(-10, -9));
         b -= {5, 6};
         CHECK(b == Vector(-15, -15));
-        b -= -16;
+        b -= {-16, 0};
         CHECK(b == Vector(1, -15));
     }
 
     TEST_CASE("Multiplication by scalar") {
         CHECK(Vector(1, -2) * 3 == Vector(3, -6));
-        CHECK(Vector(77, 98) * 0 == 0);
-        CHECK(10 * RVector(0.1, 3e-6) == Vector2<Real>(1, 3e-5));
+        CHECK(Vector(77, 98) * 0 == Vector());
+        CHECK(10 * RVector(0.1, 3e-6) == RVector(1, 3e-5));
         Vector a{1, -1};
         a *= 2;
         CHECK(a == Vector(2, -2));
@@ -447,23 +428,23 @@ TEST_SUITE("Geometry::Vector2") {
 
     TEST_CASE("Unary operators") {
         CHECK(+Vector(3, 1) == Vector(3, 1));
-        RVector a = 4;
-        CHECK(+(+a) == 4.0);
-        CHECK(-a == -4);
+        RVector a = {4, 0};
+        CHECK(+(+a) == RVector(4, 0));
+        CHECK(-a == RVector(-4, 0));
         CHECK(-Vector(10, 12) == Vector(-10, -12));
     }
 
     TEST_CASE("Dot product") {
         CHECK((Vector(4, -2) ^ Vector(1, 1)) == 2);
         CHECK((Vector(6, 7) ^ Vector(1, -1)) == -1);
-        CHECK((Vector(1, -1) ^ 0) == 0);
+        CHECK((Vector(1, -1) ^ Vector()) == 0);
         CHECK(Vector(3, 7).perpendicularTo({-7, 3}));
         CHECK_FALSE(Vector(1, 15).perpendicularTo({0, -1}));
     }
 
     TEST_CASE("Cross product") {
         CHECK(Vector(5, 4) % Vector(3, 2) == -2);
-        CHECK(RVector(0, 1) % Vector2<Real>(1, 0) == -1);
+        CHECK(RVector(0, 1) % RVector(1, 0) == -1);
         CHECK(Vector(3, 4).parallelTo(Vector(-6, -8)));
         CHECK_FALSE(Vector(1, -1).parallelTo(Vector(-1, -1)));
     }
@@ -500,7 +481,7 @@ TEST_SUITE("Geometry::Vector2") {
     }
 
     TEST_CASE("ostream operator") {
-        std::vector<Vector> vectors{{1, 3}, {-1, 7}, 0, 13};
+        std::vector<Vector> vectors{{1, 3}, {-1, 7}, {0, 0}, {13, 0}};
         std::vector<std::string> answers{"1 3", "-1 7", "0 0", "13 0"};
         for (size_t i = 0; i < vectors.size(); ++i) {
             std::ostringstream os;
