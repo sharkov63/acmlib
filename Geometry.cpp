@@ -155,7 +155,22 @@ using Point2 = Vector2<T>;
 template <typename T>
 class Vector2Common {
    public:
-    Vector2Common<T>(T x, T y) : coords{x, y} {}
+    // Default constructor.
+    Vector2Common() : coords{0, 0} {}
+
+    // Construct vector by coordinates.
+    template <typename P, typename Q = P>
+    Vector2Common(P x, Q y = 0)
+        : coords{static_cast<T>(x), static_cast<T>(y)} {}
+
+    // Conversion between vectors with different coordinate types.
+    template <typename P>
+    Vector2Common(Vector2<P> v)
+        : coords{static_cast<T>(v.x()), static_cast<T>(v.y())} {}
+
+    // Construct vector by two endpoints.
+    explicit Vector2Common(Point2<T> A, Point2<T> B)
+        : coords{B.x() - A.x(), B.y() - A.y()} {}
 
     // Access to x and y coordinates
     T& x() { return coords[0]; }
@@ -258,22 +273,7 @@ class Vector2Common {
 template <typename T, typename Enable>
 class Vector2 : public Vector2Common<T> {
    public:
-    // Default constructor.
-    Vector2() : Vector2Common<T>(0, 0) {}
-
-    // Construct vector by coordinates.
-    template <typename P, typename Q = P>
-    Vector2(P x, Q y = 0)
-        : Vector2Common<T>(static_cast<T>(x), static_cast<T>(y)) {}
-
-    // Conversion between vectors with different coordinate types.
-    template <typename P>
-    Vector2(Vector2<P> v)
-        : Vector2Common<T>(static_cast<T>(v.x()), static_cast<T>(v.y())) {}
-
-    // Construct vector by two endpoints.
-    explicit Vector2(Point2<T> A, Point2<T> B)
-        : Vector2Common<T>(B.x() - A.x(), B.y() - A.y()) {}
+    using Vector2Common<T>::Vector2Common;
 };
 
 // Distance between points
@@ -292,22 +292,7 @@ template <typename T>
 class Vector2<T, typename std::enable_if<std::is_integral<T>::value>::type>
     : public Vector2Common<T> {
    public:
-    // Default constructor.
-    Vector2() : Vector2Common<T>(0, 0) {}
-
-    // Construct vector by coordinates.
-    template <typename P, typename Q = P>
-    Vector2(P x, Q y = 0)
-        : Vector2Common<T>(static_cast<T>(x), static_cast<T>(y)) {}
-
-    // Conversion between vectors with different coordinate types.
-    template <typename P>
-    Vector2(Vector2<P> v)
-        : Vector2Common<T>(static_cast<T>(v.x()), static_cast<T>(v.y())) {}
-
-    // Construct vector by two endpoints.
-    explicit Vector2(Point2<T> A, Point2<T> B)
-        : Vector2Common<T>(B.x() - A.x(), B.y() - A.y()) {}
+    using Vector2Common<T>::Vector2Common;
 
     // Normalization
 
@@ -331,23 +316,7 @@ using Point = Vector;
 template <typename Enable>
 class Vector2<Real, Enable> : public Vector2Common<Real> {
    public:
-    // Default constructor.
-    Vector2() : Vector2Common<Real>(0, 0) {}
-
-    // Construct vector by coordinates.
-    template <typename P, typename Q = P>
-    Vector2(P x, Q y = 0)
-        : Vector2Common<Real>(static_cast<Real>(x), static_cast<Real>(y)) {}
-
-    // Conversion between vectors with different coordinate types.
-    template <typename P>
-    Vector2(Vector2<P> v)
-        : Vector2Common<Real>(static_cast<Real>(v.x()),
-                              static_cast<Real>(v.y())) {}
-
-    // Construct vector by two endpoints.
-    explicit Vector2(Point2<Real> A, Point2<Real> B)
-        : Vector2Common<Real>(B.x() - A.x(), B.y() - A.y()) {}
+    using Vector2Common<Real>::Vector2Common;
 
     // Scalar division
 
