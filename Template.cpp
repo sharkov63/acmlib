@@ -1,7 +1,3 @@
-#include <assert.h>
-#include <math.h>
-#include <time.h>
-
 #include <algorithm>
 #include <bitset>
 #include <cassert>
@@ -9,6 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <deque>
 #include <functional>
 #include <iomanip>
@@ -49,22 +46,13 @@ using pll = pair<ll, ll>;
 
 template <typename T1, typename T2>
 bool chkmin(T1& x, T2 y) {
-    if (y < x) {
-        x = y;
-        return true;
-    }
-    return false;
+    return y < x ? (x = y, true) : false;
 }
 template <typename T1, typename T2>
 bool chkmax(T1& x, T2 y) {
-    if (y > x) {
-        x = y;
-        return true;
-    }
-    return false;
+    return y > x ? (x = y, true) : false;
 }
 
-#ifndef LOCAL
 template <typename T1, typename T2>
 ostream& operator<<(ostream& stream, const pair<T1, T2>& p) {
     return stream << p.first << ' ' << p.second;
@@ -75,9 +63,9 @@ ostream& operator<<(ostream& stream, const vector<T>& v) {
     for (auto& e : v) stream << e << ' ';
     return stream;
 }
-#endif
 
 void runSolution(void);
+
 int32_t main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
@@ -89,4 +77,6 @@ int32_t main() {
 }
 /***************************************************************************/
 
-void runSolution() {}
+void runSolution() {
+    
+}
