@@ -409,7 +409,7 @@ TEST_SUITE("Geometry::Vector2") {
         CHECK(Vector(1, 2) < Vector(3, -100000));
         CHECK(RVector(0.1) <= Vector2<Real>(0.1, 0.1));
         CHECK(Vector(4, -1) >= Vector(4, -1));
-        CHECK(!(Vector(3, 0) < Vector(3, -1)));
+        CHECK_FALSE(Vector(3, 0) < Vector(3, -1));
     }
 
     TEST_CASE("Vector addition") {
@@ -508,4 +508,20 @@ TEST_SUITE("Geometry::Vector2") {
             CHECK(os.str() == answers[i]);
         }
     }
+
+    TEST_CASE("RVector division") {
+        CHECK(RVector(10, 2) / 2 == RVector(5, 1));
+        CHECK(RVector(3, 7) / 3 == RVector(1, 2.3333333333333333333333));
+        RVector a{4, 10};
+        CHECK(a / 2 == RVector(2, 5));
+        CHECK(a == RVector(4, 10));
+        a /= 2;
+        CHECK(a == RVector(2, 5));
+        a /= 2;
+        CHECK(a == RVector(1, 2.5));
+        a /= 2.5;
+        CHECK(a == RVector(0.4, 1));
+    }
+
+    TEST_CASE("RVector normalization") {}
 }
