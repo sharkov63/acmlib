@@ -297,6 +297,7 @@ void normalize(RVector& v) {
 }
 
 RVector normalized(RVector v) { return v / v.len(); }
+
 template <typename T>
 typename std::enable_if<std::is_integral<T>::value, void>::type normalize(
     Vector2<T>& v) {
@@ -310,7 +311,7 @@ typename std::enable_if<std::is_integral<T>::value, void>::type normalize(
 template <typename T>
 typename std::enable_if<std::is_integral<T>::value, Vector2<T>>::type
 normalized(Vector2<T> v) {
-    v.normalize();
+    normalize(v);
     return v;
 }
 

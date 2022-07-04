@@ -504,5 +504,20 @@ TEST_SUITE("Geometry::Vector2") {
         CHECK(a == RVector(0.4, 1));
     }
 
-    TEST_CASE("RVector normalization") {}
+    TEST_CASE("RVector normalization") {
+        CHECK(normalized(RVector{1l, 1l}) ==
+              RVector(0.7071067811865475, 0.7071067811865475));
+        RVector a{8.10073, 0};
+        normalize(a);
+        CHECK(a == RVector{1, 0});
+    }
+
+    TEST_CASE("Vector normalization (integral)") {
+        CHECK(normalized(Vector{45, 25}) == Vector{9, 5});
+        CHECK(normalized(Vector{11, -10}) == Vector{11, -10});
+        CHECK(normalized(Vector{-4, 6}) == Vector{2, -3});
+        CHECK(normalized(Vector{0, 10}) == Vector{0, 1});
+        CHECK(normalized(Vector{0, -32}) == Vector{0, 1});
+        CHECK(normalized(Vector{0, 0}) == Vector{0, 0});
+    }
 }
