@@ -1,9 +1,14 @@
-#include <cmath>
+#include <array>
 #include <limits>
+#include <memory>
 #include <sstream>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
+#define private public
 #include "Geometry.cpp"
+#undef private
 #include "doctest.h"
 
 using doctest::Approx;
@@ -251,5 +256,256 @@ TEST_SUITE("Geometry::Real") {
         CHECK(sign(Real(1.5)) == 1);
         CHECK(sign(Real(-0.0)) == 0);
         CHECK(sign(Real(-doubleEpsilon)) == 0);
+    }
+
+    TEST_CASE("Conversion to primitive types") {
+        Real a = 89.1;
+        CHECK((long long)a == 89);
+        CHECK((long)a == 89);
+        CHECK((int)a == 89);
+        CHECK((float)a == Approx(89.1));
+        CHECK((double)a == Approx(89.1));
+        CHECK((long double)a == Approx(89.1));
+    }
+}
+
+TEST_SUITE("Geometry::Vector2") {
+    TEST_CASE("Minimal sizeof") {
+#define CHECK_SIZEOF(T) CHECK(sizeof(Vector2<T>) == 2 * sizeof(T))
+        CHECK_SIZEOF(int8_t);
+        CHECK_SIZEOF(int16_t);
+        CHECK_SIZEOF(int32_t);
+        CHECK_SIZEOF(int64_t);
+        CHECK_SIZEOF(__int128);
+        CHECK_SIZEOF(float);
+        CHECK_SIZEOF(double);
+        CHECK_SIZEOF(long double);
+        CHECK_SIZEOF(Real);
+#undef CHECK_CHECK_SIZEOF
+    }
+
+    TEST_CASE("Empty constructor") {
+        Vector2<int32_t> v;
+        CHECK(v.coords[0] == 0);
+        CHECK(v.coords[1] == 0);
+    }
+
+    TEST_CASE("One parameter constructor") {
+        Vector2<int32_t> a(1);
+        CHECK(a.coords[0] == 1);
+        CHECK(a.coords[1] == 0);
+        RVector b{-3};
+        CHECK(b.coords[0] == -3);
+        CHECK(b.coords[1] == 0);
+        Vector2<float> c({12});
+        CHECK(c.coords[0] == Approx(12));
+        CHECK(c.coords[1] == Approx(0));
+        Vector2<double> d = {-0.2};
+        CHECK(d.coords[0] == Approx(-0.2));
+        CHECK(d.coords[1] == Approx(0));
+        RVector e = -11.1;
+        CHECK(e.coords[0] == -11.1);
+        CHECK(e.coords[1] == 0);
+    }
+
+    TEST_CASE("Two parameter constructor") {
+        Vector a(1, 2);
+        CHECK(a.coords[0] == 1);
+        CHECK(a.coords[1] == 2);
+        RVector b(-1, 0.5);
+        CHECK(b.coords[0] == -1);
+        CHECK(b.coords[1] == 0.5);
+        Vector2<float> c{12, 12.01};
+        CHECK(c.coords[0] == Approx(12));
+        CHECK(c.coords[1] == Approx(12.01));
+        Vector2<long double> d({3, -31.1});
+        CHECK(d.coords[0] == Approx(3));
+        CHECK(d.coords[1] == Approx(-31.1));
+        Vector e = {1, 100000};
+        CHECK(e.coords[0] == 1);
+        CHECK(e.coords[1] == 100000);
+        std::vector<RVector> ff{{1, 5}, {-0.1, 0.03}, {8, 33.1}};
+        CHECK(ff[0].coords[0] == 1);
+        CHECK(ff[0].coords[1] == 5);
+        CHECK(ff[1].coords[0] == -0.1);
+        CHECK(ff[1].coords[1] == 0.03);
+        CHECK(ff[2].coords[0] == 8);
+        CHECK(ff[2].coords[1] == 33.1);
+    }
+
+    TEST_CASE("Copy constructor") {
+        Vector a(1, 2);
+        Vector b(a);
+        CHECK(b.coords[0] == 1);
+        CHECK(b.coords[1] == 2);
+        Vector c = b;
+        CHECK(c.coords[0] == 1);
+        CHECK(c.coords[1] == 2);
+    }
+
+    TEST_CASE("Copy assignment") {
+        RVector a;
+        RVector b(0.1, 3);
+        a = b;
+        CHECK(a.coords[0] == 0.1);
+        CHECK(a.coords[1] == 3);
+    }
+
+    TEST_CASE("xy member access") {
+        Vector v{3, 4};
+        CHECK(v.x() == 3);
+        CHECK(v.y() == 4);
+        v.x() = 9;
+        v.y() = 2 * v.x();
+        CHECK(v.x() == 9);
+        CHECK(v.y() == 18);
+        std::swap(v.x(), v.y());
+        CHECK(v.x() == 18);
+        CHECK(v.y() == 9);
+    }
+
+    TEST_CASE("Indexing operator") {
+        Vector2<double> a(-11, 0.1);
+        CHECK(a[0] == -11);
+        CHECK(a[1] == 0.1);
+    }
+
+    TEST_CASE("Conversion between different coordinate types") {
+        Vector a{-1, 1337};
+        Vector2<float> b(a);
+        CHECK(b.x() == Approx(-1));
+        CHECK(b.y() == Approx(1337));
+        Vector2<double> c{a};
+        CHECK(c.x() == Approx(-1));
+        CHECK(c.y() == Approx(1337));
+        RVector d = a;
+        CHECK(d.x() == -1);
+        CHECK(d.y() == 1337);
+        RVector p{-0.1, 37.3};
+        Vector q;
+        q = p;
+        CHECK(q.x() == 0);
+        CHECK(q.y() == 37);
+    }
+
+    TEST_CASE("Construct from two endpoints") {
+        Point A{-9, 6};
+        Point B{3, 7};
+        Vector v(A, B);
+        CHECK(v.x() == 12);
+        CHECK(v.y() == 1);
+
+        RPoint P{1.2, -0.2};
+        RPoint Q{1.2, 0.1};
+        RVector u{P, Q};
+        CHECK(u.x() == 0);
+        CHECK(u.y() == 0.3);
+    }
+
+    TEST_CASE("Comparison") {
+        CHECK(Vector(3, 0) == 3);
+        CHECK(RVector(1e-12, 34.1) == Vector2<Real>(0, 34.1));
+        CHECK(Vector2<float>(4.5, 3.0003) != Vector2<float>(4.5, 3));
+        CHECK(Vector(1, 2) < Vector(3, -100000));
+        CHECK(RVector(0.1) <= Vector2<Real>(0.1, 0.1));
+        CHECK(Vector(4, -1) >= Vector(4, -1));
+        CHECK(!(Vector(3, 0) < Vector(3, -1)));
+    }
+
+    TEST_CASE("Vector addition") {
+        CHECK(Vector(1, -1) + Vector(2, 3) == Vector(3, 2));
+        CHECK(RVector(99.1, 5) + 10 == Vector2<Real>(109.1, 5));
+        Vector a{4, 1};
+        CHECK(a + Vector(-4, -1) == 0);
+        CHECK(a == Vector(4, 1));
+        a += {3, -2};
+        CHECK(a == Vector(7, -1));
+    }
+
+    TEST_CASE("Vector subtraction") {
+        CHECK(RVector(0.1, -30) - Vector2<Real>(0.7, -31) == RVector(-0.6, 1));
+        CHECK(RVector(1.3) - 0.3 == 1);
+        Vector b{-10, -9};
+        CHECK(b - Vector(-10, -8) == Vector(0, -1));
+        CHECK(b == Vector(-10, -9));
+        b -= {5, 6};
+        CHECK(b == Vector(-15, -15));
+        b -= -16;
+        CHECK(b == Vector(1, -15));
+    }
+
+    TEST_CASE("Multiplication by scalar") {
+        CHECK(Vector(1, -2) * 3 == Vector(3, -6));
+        CHECK(Vector(77, 98) * 0 == 0);
+        CHECK(10 * RVector(0.1, 3e-6) == Vector2<Real>(1, 3e-5));
+        Vector a{1, -1};
+        a *= 2;
+        CHECK(a == Vector(2, -2));
+        a *= -1;
+        CHECK(a == Vector(-2, 2));
+    }
+
+    TEST_CASE("Unary operators") {
+        CHECK(+Vector(3, 1) == Vector(3, 1));
+        RVector a = 4;
+        CHECK(+(+a) == 4.0);
+        CHECK(-a == -4);
+        CHECK(-Vector(10, 12) == Vector(-10, -12));
+    }
+
+    TEST_CASE("Dot product") {
+        CHECK((Vector(4, -2) ^ Vector(1, 1)) == 2);
+        CHECK((Vector(6, 7) ^ Vector(1, -1)) == -1);
+        CHECK((Vector(1, -1) ^ 0) == 0);
+        CHECK(Vector(3, 7).perpendicularTo({-7, 3}));
+        CHECK_FALSE(Vector(1, 15).perpendicularTo({0, -1}));
+    }
+
+    TEST_CASE("Cross product") {
+        CHECK(Vector(5, 4) % Vector(3, 2) == -2);
+        CHECK(RVector(0, 1) % Vector2<Real>(1, 0) == -1);
+        CHECK(Vector(3, 4).parallelTo(Vector(-6, -8)));
+        CHECK_FALSE(Vector(1, -1).parallelTo(Vector(-1, -1)));
+    }
+
+    TEST_CASE("Length, distance") {
+        CHECK(Vector(7, 2).len2() == 53);
+        CHECK(RVector(-10, 0).len2() == 100);
+        CHECK(Vector(3, 4).len() == 5);
+        CHECK(Vector(1, 1).len() == 1.41421356237);
+        CHECK(dist2(Point(4, 10), {5, 12}) == 5);
+        CHECK(dist(RPoint(3, 7), {0, 0}) == 7.615773105863908);
+    }
+
+    TEST_CASE("Simple rotations") {
+        CHECK(Vector(3, 4).rotatedClockwise() == Vector(4, -3));
+        CHECK(Vector(1, -90).rotatedCounterclockwise() == Vector(90, 1));
+        Vector a{0, -1};
+        a.rotateClockwise();
+        CHECK(a == Vector(-1, 0));
+        Vector b{7, 1};
+        b.rotateCounterclockwise();
+        CHECK(b == Vector(-1, 7));
+    }
+
+    TEST_CASE("istream operator") {
+        std::istringstream is("89 -1 3.05 .79 -150.01 1e11 3e+3 2E-9");
+        std::vector<RVector> values{
+            {89, -1}, {3.05, 0.79}, {-150.01, 1e11}, {3e3, 2e-9}};
+        for (auto expected : values) {
+            RVector found;
+            is >> found;
+            CHECK(expected == found);
+        }
+    }
+
+    TEST_CASE("ostream operator") {
+        std::vector<Vector> vectors{{1, 3}, {-1, 7}, 0, 13};
+        std::vector<std::string> answers{"1 3", "-1 7", "0 0", "13 0"};
+        for (size_t i = 0; i < vectors.size(); ++i) {
+            std::ostringstream os;
+            os << vectors[i];
+            CHECK(os.str() == answers[i]);
+        }
     }
 }

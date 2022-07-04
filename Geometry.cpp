@@ -1,3 +1,4 @@
+#include <array>
 #include <cmath>
 #include <iostream>
 
@@ -22,6 +23,11 @@ class Real {
     explicit operator double() const { return static_cast<double>(value); }
     explicit operator long double() const {
         return static_cast<long double>(value);
+    }
+    explicit operator int() const { return static_cast<int>(value); }
+    explicit operator long() const { return static_cast<long>(value); }
+    explicit operator long long() const {
+        return static_cast<long long>(value);
     }
 
     Real& operator+=(Real other) {
@@ -122,3 +128,139 @@ int32_t sign(T x) {
     if (x > 0) return +1;
     return -1;
 }
+
+/// A vector in euclidan space R^2
+/// with coordinates of type T.
+template <typename T>
+class Vector2 {
+   public:
+    /// Default constructor
+    Vector2<T>() : coords{0, 0} {}
+
+    /// Construct vector by two coordinates
+    template <typename P, typename Q = P>
+    Vector2<T>(P x, Q y = 0) : coords({static_cast<T>(x), static_cast<T>(y)}) {}
+
+    /// Access to x and y coordinates
+    T& x() { return coords[0]; }
+    T x() const { return coords[0]; }
+    T& y() { return coords[1]; }
+    T y() const { return coords[1]; }
+
+    /// Access to coordinates via [] operator
+    T& operator[](int i) { return coords[i]; }
+    T operator[](int i) const { return coords[i]; }
+
+    /// Conversion between different coordinates types
+    template <typename P>
+    Vector2<T>(Vector2<P> v)
+        : coords{static_cast<T>(v.x()), static_cast<T>(v.y())} {}
+
+    /// Construct vector by two endpoints
+    explicit Vector2<T>(Vector2<T> A, Vector2<T> B)
+        : coords{B.x() - A.x(), B.y() - A.y()} {}
+
+    // Comparison
+
+    bool operator==(Vector2<T> other) const { return coords == other.coords; }
+    bool operator!=(Vector2<T> other) const { return coords != other.coords; }
+    bool operator<(Vector2<T> other) const { return coords < other.coords; }
+    bool operator<=(Vector2<T> other) const { return coords <= other.coords; }
+    bool operator>(Vector2<T> other) const { return coords > other.coords; }
+    bool operator>=(Vector2<T> other) const { return coords >= other.coords; }
+
+    // Vector arithmetics
+
+    Vector2<T> operator+(Vector2<T> other) const {
+        return {x() + other.x(), y() + other.y()};
+    }
+    void operator+=(Vector2<T> other) {
+        x() += other.x();
+        y() += other.y();
+    }
+    Vector2<T> operator+() const { return *this; }
+
+    Vector2<T> operator-(Vector2<T> other) const {
+        return {x() - other.x(), y() - other.y()};
+    }
+    void operator-=(Vector2<T> other) {
+        x() -= other.x();
+        y() -= other.y();
+    }
+    Vector2<T> operator-() const { return {-x(), -y()}; }
+
+    Vector2<T> operator*(T rhs) const { return {x() * rhs, y() * rhs}; }
+    friend Vector2<T> operator*(T lhs, Vector2<T> rhs) { return rhs * lhs; }
+    void operator*=(T k) {
+        x() *= k;
+        y() *= k;
+    }
+
+    /* Vector2<T> operator/(T rhs) const { return {x() / rhs, y() / rhs}; } */
+    /* void operator/=(T k) { */
+    /*     x() /= k; */
+    /*     y() /= k; */
+    /* } */
+
+    /// Dot product
+    T operator^(Vector2<T> other) const {
+        return x() * other.x() + y() * other.y();
+    }
+
+    bool perpendicularTo(Vector2<T> other) { return (*this ^ other) == 0; }
+
+    /// Cross product
+    T operator%(Vector2<T> other) const {
+        return x() * other.y() - y() * other.x();
+    }
+
+    /// Are vectors parallel
+    bool parallelTo(Vector2<T> other) const { return *this % other == 0; }
+
+    T len2() const { return x() * x() + y() * y(); }
+    Real len() const { return sqrt(len2()); }
+    // TODO normalize
+
+    void rotateCounterclockwise() {
+        std::swap(x(), y());
+        x() *= -1;
+    }
+
+    Vector2<T> rotatedCounterclockwise() const { return {-y(), x()}; }
+
+    void rotateClockwise() {
+        std::swap(x(), y());
+        y() *= -1;
+    }
+
+    Vector2<T> rotatedClockwise() const { return {y(), -x()}; }
+
+    friend std::istream& operator>>(std::istream& is, Vector2<T>& v) {
+        return is >> v.x() >> v.y();
+    }
+    friend std::ostream& operator<<(std::ostream& os, Vector2<T> v) {
+        return os << v.x() << ' ' << v.y();
+    }
+
+   private:
+    std::array<T, 2> coords;
+};
+
+template <typename T>
+using Point2 = Vector2<T>;
+
+template <typename T>
+T dist2(Point2<T> A, Point2<T> B) {
+    return (B - A).len2();
+}
+
+template <typename T>
+Real dist(Point2<T> A, Point2<T> B) {
+    return (B - A).len();
+}
+
+using Vector = Vector2<int64_t>;
+using Point = Vector;
+using RVector = Vector2<Real>;
+using RPoint = RVector;
+
