@@ -147,15 +147,16 @@ int32_t sign(T x) {
 
 template <typename T, typename Enable = void>
 class Vector2;
+
 template <typename T>
 using Point2 = Vector2<T>;
 
 // Encapsulates common functionality
-// of Vector2 class specializations.
+// of Vector2 template class specializations.
 template <typename T>
 class Vector2Common {
    public:
-    // Default constructor.
+    // Default constructor: zero vector.
     Vector2Common() : coords{0, 0} {}
 
     // Construct vector by coordinates.
@@ -172,13 +173,13 @@ class Vector2Common {
     explicit Vector2Common(Point2<T> A, Point2<T> B)
         : coords{B.x() - A.x(), B.y() - A.y()} {}
 
-    // Access to x and y coordinates
+    // Access to x and y coordinates.
     T& x() { return coords[0]; }
     T x() const { return coords[0]; }
     T& y() { return coords[1]; }
     T y() const { return coords[1]; }
 
-    // Access to coordinates via [] operator
+    // Access to coordinates by [] operator.
     T& operator[](int i) { return coords[i]; }
     T operator[](int i) const { return coords[i]; }
 
@@ -268,7 +269,7 @@ class Vector2Common {
     operator Vector2<T>() const { return {x(), y()}; }
 };
 
-// A vector in euclidan space R^2
+// A 2-dimensional vector
 // with coordinates of type T.
 template <typename T, typename Enable>
 class Vector2 : public Vector2Common<T> {
@@ -276,32 +277,33 @@ class Vector2 : public Vector2Common<T> {
     using Vector2Common<T>::Vector2Common;
 };
 
-// Distance between points
-
+// Squared euclidean distance between two points.
 template <typename T>
 T dist2(Point2<T> A, Point2<T> B) {
     return (B - A).len2();
 }
 
+// Euclidean distance between two points.
 template <typename T>
 Real dist(Point2<T> A, Point2<T> B) {
     return (B - A).len();
 }
 
+// Specialization for integral cooridnate types (int, long long, etc.).
 template <typename T>
 class Vector2<T, typename std::enable_if<std::is_integral<T>::value>::type>
     : public Vector2Common<T> {
    public:
     using Vector2Common<T>::Vector2Common;
 
-    // Normalization
-
+    // Scales the vector down, so that the coordinates are coprime,
+    // and takes
     void normalize() {
         auto g = std::gcd(this->x(), this->y());
         if (!g) return;
         if (this->x() < 0 || (this->x() == 0 && this->y() < 0)) g *= -1;
-        this->x /= g;
-        this->y /= g;
+        this->x() /= g;
+        this->y() /= g;
     }
 
     Vector2<T> normalized() const {
