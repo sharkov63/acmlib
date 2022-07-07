@@ -151,11 +151,6 @@ class Vector2;
 template <typename T>
 using Point2 = Vector2<T>;
 
-using Vector = Vector2<int64_t>;
-using Point = Vector;
-using RVector = Vector2<Real>;
-using RPoint = RVector;
-
 // A 2-dimensional vector
 // with coordinates of type T.
 template <typename T>
@@ -222,6 +217,11 @@ class Vector2 {
         x() *= k;
         y() *= k;
     }
+    Vector2<T> operator/(T rhs) const { return {x() / rhs, y() / rhs}; }
+    void operator/=(T rhs) {
+        x() /= rhs;
+        y() /= rhs;
+    }
 
     // Dot product
     T operator^(Vector2<T> other) const {
@@ -282,14 +282,8 @@ template <typename T>
 Real dist(Point2<T> A, Point2<T> B) {
     return (B - A).len();
 }
-
-RVector operator/(RVector lhs, Real rhs) {
-    return {lhs.x() / rhs, lhs.y() / rhs};
-}
-void operator/=(RVector& lhs, Real rhs) {
-    lhs.x() /= rhs;
-    lhs.y() /= rhs;
-}
+using RVector = Vector2<Real>;
+using RPoint = RVector;
 
 void normalize(RVector& v) {
     Real l = v.len();
@@ -297,6 +291,9 @@ void normalize(RVector& v) {
 }
 
 RVector normalized(RVector v) { return v / v.len(); }
+
+using Vector = Vector2<int64_t>;
+using Point = Vector;
 
 template <typename T>
 typename std::enable_if<std::is_integral<T>::value, void>::type normalize(

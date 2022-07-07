@@ -512,6 +512,24 @@ TEST_SUITE("Geometry::Vector2") {
         CHECK(a == RVector{1, 0});
     }
 
+    TEST_CASE("Vector division (intergral)") {
+        CHECK(Vector(4, 6) / 2 == Vector(2, 3));
+        CHECK(Vector(9, 7) / 3 == Vector(3, 2));
+        Vector v{50, 24};
+        CHECK(v / 2 == Vector(25, 12));
+        CHECK(v == Vector(50, 24));
+        v /= 2;
+        CHECK(v == Vector(25, 12));
+        v /= 5;
+        CHECK(v == Vector(5, 2));
+        v /= 2;
+        CHECK(v == Vector(2, 1));
+        v /= 1;
+        CHECK(v == Vector(2, 1));
+        v /= 3;
+        CHECK(v == Vector(0, 0));
+    }
+
     TEST_CASE("Vector normalization (integral)") {
         CHECK(normalized(Vector{45, 25}) == Vector{9, 5});
         CHECK(normalized(Vector{11, -10}) == Vector{11, -10});
