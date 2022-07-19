@@ -24,13 +24,6 @@
 
 using namespace std;
 
-#ifdef LOCAL
-#include "acm/debug.hpp"
-#else
-#define DEBUG(...) ;
-#define ADEBUG(a, n) ;
-#endif
-
 #define ALL(a) (a).begin(), (a).end()
 #define TIME (static_cast<long double>(clock()) / CLOCKS_PER_SEC)
 
@@ -64,6 +57,13 @@ ostream& operator<<(ostream& stream, const vector<T>& v) {
     return stream;
 }
 
+#ifdef LOCAL
+#include "acm/debug.hpp"
+#else
+#define DEBUG(...) ;
+#define ADEBUG(a, n) ;
+#endif
+
 void runSolution(void);
 
 int32_t main() {
@@ -77,6 +77,4 @@ int32_t main() {
 }
 /***************************************************************************/
 
-void runSolution() {
-    
-}
+void runSolution() {}
