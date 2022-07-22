@@ -58,7 +58,7 @@ class Real {
     }
 
     Real operator+() const { return *this; }
-    Real operator-() const { return Real(-value); }
+    Real operator-() const { return -value; }
     Real& operator++() {
         ++value;
         return *this;
@@ -108,10 +108,10 @@ class Real {
         return os << x.value;
     }
 };
-Real operator+(Real lhs, Real rhs) { return Real(lhs) += rhs; }
-Real operator-(Real lhs, Real rhs) { return Real(lhs) -= rhs; }
-Real operator*(Real lhs, Real rhs) { return Real(lhs) *= rhs; }
-Real operator/(Real lhs, Real rhs) { return Real(lhs) /= rhs; }
+Real operator+(Real lhs, Real rhs) { return lhs += rhs; }
+Real operator-(Real lhs, Real rhs) { return lhs -= rhs; }
+Real operator*(Real lhs, Real rhs) { return lhs *= rhs; }
+Real operator/(Real lhs, Real rhs) { return lhs /= rhs; }
 
 // Overloads of some functions from <cmath> for Real type.
 
@@ -153,6 +153,9 @@ using Point2 = Vector2<T>;
 
 // A 2-dimensional vector
 // with coordinates of type T.
+//
+// Type T is implied to be small
+// and is always passed by value.
 template <typename T>
 class Vector2 {
    public:
