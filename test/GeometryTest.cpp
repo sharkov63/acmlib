@@ -538,4 +538,18 @@ TEST_SUITE("Geometry::Vector2") {
         CHECK(normalized(Vector{0, -32}) == Vector{0, 1});
         CHECK(normalized(Vector{0, 0}) == Vector{0, 0});
     }
+
+    TEST_CASE("Vector2 range-based for loop") {
+        Vector2<int> a{1, 2};
+        std::vector<int> ac;
+        const Vector2<int>& ref_a = a;
+        for (const int& x : ref_a) {
+            ac.push_back(x);
+        }
+        CHECK(ac == std::vector<int>{1, 2});
+        for (int& x : a) {
+            x = 3 - x;
+        }
+        CHECK(a == Vector2<int>{2, 1});
+    }
 }

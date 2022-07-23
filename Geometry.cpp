@@ -270,6 +270,11 @@ class Vector2 {
         return os << v.x() << ' ' << v.y();
     }
 
+    auto begin() { return coords.begin(); }
+    auto begin() const { return coords.begin(); }
+    auto end() { return coords.end(); }
+    auto end() const { return coords.end(); }
+
    private:
     std::array<T, 2> coords;
 };
