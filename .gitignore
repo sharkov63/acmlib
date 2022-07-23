@@ -3,3 +3,8 @@ test/compile_commands.json
 test/neovim.json
 test/.cache/
 test/.nvimrc
+benchmark/build
+benchmark/compile_commands.json
+benchmark/neovim.json
+benchmark/.cache/
+benchmark/.nvimrc
