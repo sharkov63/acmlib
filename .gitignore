@@ -1,9 +1,10 @@
-# Ignore all
-*
-# Unignore all with extensions
-!*.*
-# Unignore all dirs
-!*/
-# ABOVE combination will ignore all files without extension
-
-in
+test/build
+test/compile_commands.json
+test/neovim.json
+test/.cache/
+test/.nvimrc
+benchmark/build
+benchmark/compile_commands.json
+benchmark/neovim.json
+benchmark/.cache/
+benchmark/.nvimrc

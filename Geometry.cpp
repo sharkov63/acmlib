@@ -1,0 +1,322 @@
+#include <array>
+#include <cmath>
+#include <iostream>
+#include <numeric>
+
+// A helper class for real number computation,
+// which overrides comparison operators
+// to compare reals with epsilon-precision.
+class Real {
+   public:
+    // Underlying primitive floating-point type.
+    // Feel free to change it to double/float
+    // for better performance.
+    using PrimitiveReal = long double;
+
+    // Allowed approximation error.
+    // Feel free to tweak it.
+    static constexpr const PrimitiveReal eps = 1e-9;
+
+   private:
+    PrimitiveReal value;
+
+   public:
+    Real() : value(0) {}
+    template <typename T>
+    Real(T x) : value(static_cast<PrimitiveReal>(x)) {}
+
+    // Conversion to primitive types
+
+    explicit operator float() const { return static_cast<float>(value); }
+    explicit operator double() const { return static_cast<double>(value); }
+    explicit operator long double() const {
+        return static_cast<long double>(value);
+    }
+    explicit operator int() const { return static_cast<int>(value); }
+    explicit operator long() const { return static_cast<long>(value); }
+    explicit operator long long() const {
+        return static_cast<long long>(value);
+    }
+
+    // Arithmetic
+
+    Real& operator+=(Real other) {
+        value += other.value;
+        return *this;
+    }
+    Real& operator-=(Real other) {
+        value -= other.value;
+        return *this;
+    }
+    Real& operator*=(Real other) {
+        value *= other.value;
+        return *this;
+    }
+    Real& operator/=(Real other) {
+        value /= other.value;
+        return *this;
+    }
+
+    Real operator+() const { return *this; }
+    Real operator-() const { return -value; }
+    Real& operator++() {
+        ++value;
+        return *this;
+    }
+    Real operator++(int32_t) {
+        Real copy = *this;
+        ++value;
+        return copy;
+    }
+    Real& operator--() {
+        --value;
+        return *this;
+    }
+    Real operator--(int32_t) {
+        Real copy = *this;
+        --value;
+        return copy;
+    }
+
+    // Comparison
+
+    friend bool operator==(Real lhs, Real rhs) {
+        return std::fabs(lhs.value - rhs.value) < eps;
+    }
+    friend bool operator!=(Real lhs, Real rhs) {
+        return std::fabs(lhs.value - rhs.value) >= eps;
+    }
+    friend bool operator<(Real lhs, Real rhs) {
+        return lhs.value <= rhs.value - eps;
+    }
+    friend bool operator>(Real lhs, Real rhs) {
+        return lhs.value >= rhs.value + eps;
+    }
+    friend bool operator<=(Real lhs, Real rhs) {
+        return lhs.value < rhs.value + eps;
+    }
+    friend bool operator>=(Real lhs, Real rhs) {
+        return lhs.value > rhs.value - eps;
+    }
+
+    // iostream operators
+
+    friend std::istream& operator>>(std::istream& is, Real& x) {
+        return is >> x.value;
+    }
+    friend std::ostream& operator<<(std::ostream& os, Real x) {
+        return os << x.value;
+    }
+};
+Real operator+(Real lhs, Real rhs) { return lhs += rhs; }
+Real operator-(Real lhs, Real rhs) { return lhs -= rhs; }
+Real operator*(Real lhs, Real rhs) { return lhs *= rhs; }
+Real operator/(Real lhs, Real rhs) { return lhs /= rhs; }
+
+// Overloads of some functions from <cmath> for Real type.
+
+Real acos(Real x) { return std::acos((Real::PrimitiveReal)x); }
+Real asin(Real x) { return std::asin((Real::PrimitiveReal)x); }
+Real atan(Real x) { return std::atan((Real::PrimitiveReal)x); }
+Real atan2(Real y, Real x) {
+    return std::atan2((Real::PrimitiveReal)y, (Real::PrimitiveReal)x);
+}
+Real ceil(Real x) { return std::ceil((Real::PrimitiveReal)x); }
+Real cos(Real x) { return std::cos((Real::PrimitiveReal)x); }
+Real cosh(Real x) { return std::cosh((Real::PrimitiveReal)x); }
+Real exp(Real x) { return std::exp((Real::PrimitiveReal)x); }
+Real fabs(Real x) { return std::fabs((Real::PrimitiveReal)x); }
+Real floor(Real x) { return std::floor((Real::PrimitiveReal)x); }
+Real log(Real x) { return std::log((Real::PrimitiveReal)x); }
+Real log10(Real x) { return std::log10((Real::PrimitiveReal)x); }
+Real pow(Real x, Real y) {
+    return std::pow((Real::PrimitiveReal)x, (Real::PrimitiveReal)y);
+}
+Real sin(Real x) { return std::sin((Real::PrimitiveReal)x); }
+Real sinh(Real x) { return std::sinh((Real::PrimitiveReal)x); }
+Real sqrt(Real x) { return std::sqrt((Real::PrimitiveReal)x); }
+Real tan(Real x) { return std::tan((Real::PrimitiveReal)x); }
+Real tanh(Real x) { return std::tanh((Real::PrimitiveReal)x); }
+
+template <typename T>
+int32_t sign(T x) {
+    if (x == 0) return 0;
+    if (x > 0) return +1;
+    return -1;
+}
+
+template <typename T>
+class Vector2;
+
+template <typename T>
+using Point2 = Vector2<T>;
+
+// A 2-dimensional vector
+// with coordinates of type T.
+//
+// Type T is implied to be small
+// and is always passed by value.
+template <typename T>
+class Vector2 {
+   public:
+    // Default constructor: zero vector.
+    Vector2<T>() : coords{0, 0} {}
+
+    // Construct vector by coordinates.
+    template <typename P, typename Q = P>
+    Vector2<T>(P x, Q y) : coords{static_cast<T>(x), static_cast<T>(y)} {}
+
+    // Conversion between vectors with different coordinate types.
+    template <typename P>
+    Vector2<T>(Vector2<P> v)
+        : coords{static_cast<T>(v.x()), static_cast<T>(v.y())} {}
+
+    // Construct vector by two endpoints.
+    explicit Vector2<T>(Point2<T> A, Point2<T> B)
+        : coords{B.x() - A.x(), B.y() - A.y()} {}
+
+    // Access to x and y coordinates.
+    T& x() { return coords[0]; }
+    T x() const { return coords[0]; }
+    T& y() { return coords[1]; }
+    T y() const { return coords[1]; }
+
+    // Access to coordinates by [] operator.
+    T& operator[](int i) { return coords[i]; }
+    T operator[](int i) const { return coords[i]; }
+
+    // Comparison
+
+    bool operator==(Vector2<T> other) const { return coords == other.coords; }
+    bool operator!=(Vector2<T> other) const { return coords != other.coords; }
+    bool operator<(Vector2<T> other) const { return coords < other.coords; }
+    bool operator<=(Vector2<T> other) const { return coords <= other.coords; }
+    bool operator>(Vector2<T> other) const { return coords > other.coords; }
+    bool operator>=(Vector2<T> other) const { return coords >= other.coords; }
+
+    // Arithmetic operators
+
+    Vector2<T> operator+(Vector2<T> other) const {
+        return {x() + other.x(), y() + other.y()};
+    }
+    void operator+=(Vector2<T> other) {
+        x() += other.x();
+        y() += other.y();
+    }
+    Vector2<T> operator+() const { return *this; }
+
+    Vector2<T> operator-(Vector2<T> other) const {
+        return {x() - other.x(), y() - other.y()};
+    }
+    void operator-=(Vector2<T> other) {
+        x() -= other.x();
+        y() -= other.y();
+    }
+    Vector2<T> operator-() const { return {-x(), -y()}; }
+
+    Vector2<T> operator*(T rhs) const { return {x() * rhs, y() * rhs}; }
+    friend Vector2<T> operator*(T lhs, Vector2<T> rhs) { return rhs * lhs; }
+    void operator*=(T k) {
+        x() *= k;
+        y() *= k;
+    }
+    Vector2<T> operator/(T rhs) const { return {x() / rhs, y() / rhs}; }
+    void operator/=(T rhs) {
+        x() /= rhs;
+        y() /= rhs;
+    }
+
+    // Dot product
+    T operator^(Vector2<T> other) const {
+        return x() * other.x() + y() * other.y();
+    }
+
+    bool perpendicularTo(Vector2<T> other) { return (*this ^ other) == 0; }
+
+    // Cross product
+    T operator%(Vector2<T> other) const {
+        return x() * other.y() - y() * other.x();
+    }
+
+    bool parallelTo(Vector2<T> other) const { return *this % other == 0; }
+
+    // Length
+
+    T len2() const { return x() * x() + y() * y(); }
+    Real len() const { return sqrt(len2()); }
+
+    // Simple rotations
+
+    void rotateCounterclockwise() {
+        std::swap(x(), y());
+        x() *= -1;
+    }
+
+    Vector2<T> rotatedCounterclockwise() const { return {-y(), x()}; }
+
+    void rotateClockwise() {
+        std::swap(x(), y());
+        y() *= -1;
+    }
+
+    Vector2<T> rotatedClockwise() const { return {y(), -x()}; }
+
+    // iostream operators
+
+    friend std::istream& operator>>(std::istream& is, Vector2<T>& v) {
+        return is >> v.x() >> v.y();
+    }
+    friend std::ostream& operator<<(std::ostream& os, Vector2<T> v) {
+        return os << v.x() << ' ' << v.y();
+    }
+
+    auto begin() { return coords.begin(); }
+    auto begin() const { return coords.begin(); }
+    auto end() { return coords.end(); }
+    auto end() const { return coords.end(); }
+
+   private:
+    std::array<T, 2> coords;
+};
+
+// Squared euclidean distance between two points.
+template <typename T>
+T dist2(Point2<T> A, Point2<T> B) {
+    return (B - A).len2();
+}
+
+// Euclidean distance between two points.
+template <typename T>
+Real dist(Point2<T> A, Point2<T> B) {
+    return (B - A).len();
+}
+using RVector = Vector2<Real>;
+using RPoint = RVector;
+
+void normalize(RVector& v) {
+    Real l = v.len();
+    v /= l;
+}
+
+RVector normalized(RVector v) { return v / v.len(); }
+
+using Vector = Vector2<int64_t>;
+using Point = Vector;
+
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value, void>::type normalize(
+    Vector2<T>& v) {
+    auto g = std::gcd(v.x(), v.y());
+    if (!g) return;
+    if (v.x() < 0 || (v.x() == 0 && v.y() < 0)) g *= -1;
+    v.x() /= g;
+    v.y() /= g;
+}
+
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value, Vector2<T>>::type
+normalized(Vector2<T> v) {
+    normalize(v);
+    return v;
+}
+
