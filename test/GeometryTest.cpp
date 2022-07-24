@@ -269,9 +269,9 @@ TEST_SUITE("Geometry::Real") {
     }
 }
 
-TEST_SUITE("Geometry::Vector2") {
+TEST_SUITE("Geometry::Vector") {
     TEST_CASE("Minimal sizeof") {
-#define CHECK_SIZEOF(T) CHECK(sizeof(Vector2<T>) == 2 * sizeof(T))
+#define CHECK_SIZEOF(T) CHECK(sizeof(Vector<T>) == 2 * sizeof(T))
         CHECK_SIZEOF(int8_t);
         CHECK_SIZEOF(int16_t);
         CHECK_SIZEOF(int32_t);
@@ -285,25 +285,25 @@ TEST_SUITE("Geometry::Vector2") {
     }
 
     TEST_CASE("Empty constructor") {
-        Vector2<int32_t> v;
+        Vector<int32_t> v;
         CHECK(v.coords[0] == 0);
         CHECK(v.coords[1] == 0);
     }
 
     TEST_CASE("Two parameter constructor") {
-        Vector a(1, 2);
+        LVector a(1, 2);
         CHECK(a.coords[0] == 1);
         CHECK(a.coords[1] == 2);
         RVector b(-1, 0.5);
         CHECK(b.coords[0] == -1);
         CHECK(b.coords[1] == 0.5);
-        Vector2<float> c{12, 12.01};
+        Vector<float> c{12, 12.01};
         CHECK(c.coords[0] == Approx(12));
         CHECK(c.coords[1] == Approx(12.01));
-        Vector2<long double> d({3, -31.1});
+        Vector<long double> d({3, -31.1});
         CHECK(d.coords[0] == Approx(3));
         CHECK(d.coords[1] == Approx(-31.1));
-        Vector e = {1, 100000};
+        LVector e = {1, 100000};
         CHECK(e.coords[0] == 1);
         CHECK(e.coords[1] == 100000);
         std::vector<RVector> ff{{1, 5}, {-0.1, 0.03}, {8, 33.1}};
@@ -316,11 +316,11 @@ TEST_SUITE("Geometry::Vector2") {
     }
 
     TEST_CASE("Copy constructor") {
-        Vector a(1, 2);
-        Vector b(a);
+        LVector a(1, 2);
+        LVector b(a);
         CHECK(b.coords[0] == 1);
         CHECK(b.coords[1] == 2);
-        Vector c = b;
+        LVector c = b;
         CHECK(c.coords[0] == 1);
         CHECK(c.coords[1] == 2);
     }
@@ -334,7 +334,7 @@ TEST_SUITE("Geometry::Vector2") {
     }
 
     TEST_CASE("xy member access") {
-        Vector v{3, 4};
+        LVector v{3, 4};
         CHECK(v.x() == 3);
         CHECK(v.y() == 4);
         v.x() = 9;
@@ -347,33 +347,33 @@ TEST_SUITE("Geometry::Vector2") {
     }
 
     TEST_CASE("Indexing operator") {
-        Vector2<double> a(-11, 0.1);
+        Vector<double> a(-11, 0.1);
         CHECK(a[0] == -11);
         CHECK(a[1] == 0.1);
     }
 
     TEST_CASE("Conversion between different coordinate types") {
-        Vector a{-1, 1337};
-        Vector2<float> b(a);
+        LVector a{-1, 1337};
+        Vector<float> b(a);
         CHECK(b.x() == Approx(-1));
         CHECK(b.y() == Approx(1337));
-        Vector2<double> c{a};
+        Vector<double> c{a};
         CHECK(c.x() == Approx(-1));
         CHECK(c.y() == Approx(1337));
         RVector d = a;
         CHECK(d.x() == -1);
         CHECK(d.y() == 1337);
         RVector p{-0.1, 37.3};
-        Vector q;
+        LVector q;
         q = p;
         CHECK(q.x() == 0);
         CHECK(q.y() == 37);
     }
 
     TEST_CASE("Construct from two endpoints") {
-        Point A{-9, 6};
-        Point B{3, 7};
-        Vector v(A, B);
+        LPoint A{-9, 6};
+        LPoint B{3, 7};
+        LVector v(A, B);
         CHECK(v.x() == 12);
         CHECK(v.y() == 1);
 
@@ -386,87 +386,87 @@ TEST_SUITE("Geometry::Vector2") {
 
     TEST_CASE("Comparison") {
         CHECK(RVector(1e-12, 34.1) == RVector(0, 34.1));
-        CHECK(Vector2<float>(4.5, 3.0003) != Vector2<float>(4.5, 3));
-        CHECK(Vector(1, 2) < Vector(3, -100000));
+        CHECK(Vector<float>(4.5, 3.0003) != Vector<float>(4.5, 3));
+        CHECK(LVector(1, 2) < LVector(3, -100000));
         CHECK(RVector(0.1, 0) <= RVector(0.1, 0.1));
-        CHECK(Vector(4, -1) >= Vector(4, -1));
-        CHECK_FALSE(Vector(3, 0) < Vector(3, -1));
+        CHECK(LVector(4, -1) >= LVector(4, -1));
+        CHECK_FALSE(LVector(3, 0) < LVector(3, -1));
     }
 
-    TEST_CASE("Vector addition") {
-        CHECK(Vector(1, -1) + Vector(2, 3) == Vector(3, 2));
+    TEST_CASE("LVector addition") {
+        CHECK(LVector(1, -1) + LVector(2, 3) == LVector(3, 2));
         CHECK(RVector(99.1, 5) + RVector(10, 0) == RVector(109.1, 5));
-        Vector a{4, 1};
-        CHECK(a + Vector(-4, -1) == RVector());
-        CHECK(a == Vector(4, 1));
+        LVector a{4, 1};
+        CHECK(a + LVector(-4, -1) == RVector());
+        CHECK(a == LVector(4, 1));
         a += {3, -2};
-        CHECK(a == Vector(7, -1));
+        CHECK(a == LVector(7, -1));
     }
 
-    TEST_CASE("Vector subtraction") {
+    TEST_CASE("LVector subtraction") {
         CHECK(RVector(0.1, -30) - RVector(0.7, -31) == RVector(-0.6, 1));
         CHECK(RVector(1.3, 0) - RVector(0.3, 0) == RVector(1, 0));
-        Vector b{-10, -9};
-        CHECK(b - Vector(-10, -8) == Vector(0, -1));
-        CHECK(b == Vector(-10, -9));
+        LVector b{-10, -9};
+        CHECK(b - LVector(-10, -8) == LVector(0, -1));
+        CHECK(b == LVector(-10, -9));
         b -= {5, 6};
-        CHECK(b == Vector(-15, -15));
+        CHECK(b == LVector(-15, -15));
         b -= {-16, 0};
-        CHECK(b == Vector(1, -15));
+        CHECK(b == LVector(1, -15));
     }
 
     TEST_CASE("Multiplication by scalar") {
-        CHECK(Vector(1, -2) * 3 == Vector(3, -6));
-        CHECK(Vector(77, 98) * 0 == Vector());
+        CHECK(LVector(1, -2) * 3 == LVector(3, -6));
+        CHECK(LVector(77, 98) * 0 == LVector());
         CHECK(10 * RVector(0.1, 3e-6) == RVector(1, 3e-5));
-        Vector a{1, -1};
+        LVector a{1, -1};
         a *= 2;
-        CHECK(a == Vector(2, -2));
+        CHECK(a == LVector(2, -2));
         a *= -1;
-        CHECK(a == Vector(-2, 2));
+        CHECK(a == LVector(-2, 2));
     }
 
     TEST_CASE("Unary operators") {
-        CHECK(+Vector(3, 1) == Vector(3, 1));
+        CHECK(+LVector(3, 1) == LVector(3, 1));
         RVector a = {4, 0};
         CHECK(+(+a) == RVector(4, 0));
         CHECK(-a == RVector(-4, 0));
-        CHECK(-Vector(10, 12) == Vector(-10, -12));
+        CHECK(-LVector(10, 12) == LVector(-10, -12));
     }
 
     TEST_CASE("Dot product") {
-        CHECK((Vector(4, -2) ^ Vector(1, 1)) == 2);
-        CHECK((Vector(6, 7) ^ Vector(1, -1)) == -1);
-        CHECK((Vector(1, -1) ^ Vector()) == 0);
-        CHECK(Vector(3, 7).perpendicularTo({-7, 3}));
-        CHECK_FALSE(Vector(1, 15).perpendicularTo({0, -1}));
+        CHECK((LVector(4, -2) ^ LVector(1, 1)) == 2);
+        CHECK((LVector(6, 7) ^ LVector(1, -1)) == -1);
+        CHECK((LVector(1, -1) ^ LVector()) == 0);
+        CHECK(LVector(3, 7).perpendicularTo({-7, 3}));
+        CHECK_FALSE(LVector(1, 15).perpendicularTo({0, -1}));
     }
 
     TEST_CASE("Cross product") {
-        CHECK(Vector(5, 4) % Vector(3, 2) == -2);
+        CHECK(LVector(5, 4) % LVector(3, 2) == -2);
         CHECK(RVector(0, 1) % RVector(1, 0) == -1);
-        CHECK(Vector(3, 4).parallelTo(Vector(-6, -8)));
-        CHECK_FALSE(Vector(1, -1).parallelTo(Vector(-1, -1)));
+        CHECK(LVector(3, 4).parallelTo(LVector(-6, -8)));
+        CHECK_FALSE(LVector(1, -1).parallelTo(LVector(-1, -1)));
     }
 
     TEST_CASE("Length, distance") {
-        CHECK(Vector(7, 2).len2() == 53);
+        CHECK(LVector(7, 2).len2() == 53);
         CHECK(RVector(-10, 0).len2() == 100);
-        CHECK(Vector(3, 4).len() == 5);
-        CHECK(Vector(1, 1).len() == 1.41421356237);
-        CHECK(dist2(Point(4, 10), {5, 12}) == 5);
+        CHECK(LVector(3, 4).len() == 5);
+        CHECK(LVector(1, 1).len() == 1.41421356237);
+        CHECK(dist2(LPoint(4, 10), {5, 12}) == 5);
         CHECK(dist(RPoint(3, 7), {0, 0}) == 7.615773105863908);
     }
 
     TEST_CASE("Simple rotations") {
-        CHECK(Vector(3, 4).rotatedClockwise() == Vector(4, -3));
-        CHECK(Vector(1, -90).rotatedCounterclockwise() == Vector(90, 1));
-        Vector a{0, -1};
+        CHECK(LVector(3, 4).rotatedClockwise() == LVector(4, -3));
+        CHECK(LVector(1, -90).rotatedCounterclockwise() == LVector(90, 1));
+        LVector a{0, -1};
         a.rotateClockwise();
-        CHECK(a == Vector(-1, 0));
-        Vector b{7, 1};
+        CHECK(a == LVector(-1, 0));
+        LVector b{7, 1};
         b.rotateCounterclockwise();
-        CHECK(b == Vector(-1, 7));
+        CHECK(b == LVector(-1, 7));
     }
 
     TEST_CASE("istream operator") {
@@ -481,7 +481,7 @@ TEST_SUITE("Geometry::Vector2") {
     }
 
     TEST_CASE("ostream operator") {
-        std::vector<Vector> vectors{{1, 3}, {-1, 7}, {0, 0}, {13, 0}};
+        std::vector<LVector> vectors{{1, 3}, {-1, 7}, {0, 0}, {13, 0}};
         std::vector<std::string> answers{"1 3", "-1 7", "0 0", "13 0"};
         for (size_t i = 0; i < vectors.size(); ++i) {
             std::ostringstream os;
@@ -512,37 +512,37 @@ TEST_SUITE("Geometry::Vector2") {
         CHECK(a == RVector{1, 0});
     }
 
-    TEST_CASE("Vector division (intergral)") {
-        CHECK(Vector(4, 6) / 2 == Vector(2, 3));
-        CHECK(Vector(9, 7) / 3 == Vector(3, 2));
-        Vector v{50, 24};
-        CHECK(v / 2 == Vector(25, 12));
-        CHECK(v == Vector(50, 24));
+    TEST_CASE("LVector division (intergral)") {
+        CHECK(LVector(4, 6) / 2 == LVector(2, 3));
+        CHECK(LVector(9, 7) / 3 == LVector(3, 2));
+        LVector v{50, 24};
+        CHECK(v / 2 == LVector(25, 12));
+        CHECK(v == LVector(50, 24));
         v /= 2;
-        CHECK(v == Vector(25, 12));
+        CHECK(v == LVector(25, 12));
         v /= 5;
-        CHECK(v == Vector(5, 2));
+        CHECK(v == LVector(5, 2));
         v /= 2;
-        CHECK(v == Vector(2, 1));
+        CHECK(v == LVector(2, 1));
         v /= 1;
-        CHECK(v == Vector(2, 1));
+        CHECK(v == LVector(2, 1));
         v /= 3;
-        CHECK(v == Vector(0, 0));
+        CHECK(v == LVector(0, 0));
     }
 
-    TEST_CASE("Vector normalization (integral)") {
-        CHECK(normalized(Vector{45, 25}) == Vector{9, 5});
-        CHECK(normalized(Vector{11, -10}) == Vector{11, -10});
-        CHECK(normalized(Vector{-4, 6}) == Vector{2, -3});
-        CHECK(normalized(Vector{0, 10}) == Vector{0, 1});
-        CHECK(normalized(Vector{0, -32}) == Vector{0, 1});
-        CHECK(normalized(Vector{0, 0}) == Vector{0, 0});
+    TEST_CASE("LVector normalization (integral)") {
+        CHECK(normalized(LVector{45, 25}) == LVector{9, 5});
+        CHECK(normalized(LVector{11, -10}) == LVector{11, -10});
+        CHECK(normalized(LVector{-4, 6}) == LVector{2, -3});
+        CHECK(normalized(LVector{0, 10}) == LVector{0, 1});
+        CHECK(normalized(LVector{0, -32}) == LVector{0, 1});
+        CHECK(normalized(LVector{0, 0}) == LVector{0, 0});
     }
 
-    TEST_CASE("Vector2 range-based for loop") {
-        Vector2<int> a{1, 2};
+    TEST_CASE("Vector range-based for loop") {
+        Vector<int> a{1, 2};
         std::vector<int> ac;
-        const Vector2<int>& ref_a = a;
+        const Vector<int>& ref_a = a;
         for (const int& x : ref_a) {
             ac.push_back(x);
         }
@@ -550,7 +550,7 @@ TEST_SUITE("Geometry::Vector2") {
         for (int& x : a) {
             x = 3 - x;
         }
-        CHECK(a == Vector2<int>{2, 1});
+        CHECK(a == Vector<int>{2, 1});
     }
 
     TEST_CASE("triangleArea (by two vectors)") {
@@ -565,5 +565,69 @@ TEST_SUITE("Geometry::Vector2") {
         CHECK(triangleArea<Real>({0.5, 6}, {11, 12}, {0.5, 6}) == 0);
         CHECK(triangleArea<Real>({0, 0}, {3, 4}, {4, 3}) == 3.5);
         CHECK(triangleArea<Real>({3, 4}, {0, 0}, {4, 3}) == 3.5);
+    }
+}
+
+TEST_SUITE("Geometry::Line") {
+    TEST_CASE("Constructors") {
+        Line<int32_t> l{1, 2, 3};
+        CHECK(l.a() == 1);
+        CHECK(l.b() == 2);
+        CHECK(l.c() == 3);
+        Line<Real> k({1, 0}, {0, 1});
+        CHECK(k.a() == k.b());
+        CHECK(k.a() == k.c());
+    }
+
+    TEST_CASE("eval") {
+        LLine l{1, -5, 3};
+        CHECK(l.eval({3, 4}) == -17);
+        CHECK(l.eval({0, 0}) == 0);
+        CHECK(l.eval({5, 1}) == 0);
+    }
+
+    TEST_CASE("contains") {
+        LLine l{4, 3, 1};
+        CHECK(l.contains({1, -1}));
+        CHECK_FALSE(l.contains({0, 0}));
+        CHECK_FALSE(l.contains({-38, 11}));
+        CHECK(l.contains({10, -13}));
+    }
+
+    TEST_CASE("relativePosition") {
+        LLine l{5, 9, 0};
+        CHECK(l.relativePosition({0, 0}) == 0);
+        CHECK(l.relativePosition({1, -1}) == -1);
+        CHECK(l.relativePosition({1, 1}) == 1);
+        CHECK(l.relativePosition({9, -5}) == 0);
+    }
+
+    TEST_CASE("istream operator") {
+        std::istringstream is("56 -7 10 .32 1e11 3e-3");
+        std::vector<RLine> values{{56, -7, 10}, {0.32, 1e11, 3e-3}};
+        for (auto expected : values) {
+            RLine found;
+            is >> found;
+            CHECK(expected.a() == found.a());
+            CHECK(expected.b() == found.b());
+            CHECK(expected.c() == found.c());
+        }
+    }
+
+    TEST_CASE("ostream operator") {
+        std::vector<LLine> lines{{0, 0, 1}, {3, 4, -2}};
+        std::vector<std::string> answers{"0 0 1", "3 4 -2"};
+        for (size_t i = 0; i < lines.size(); ++i) {
+            std::ostringstream os;
+            os << lines[i];
+            CHECK(os.str() == answers[i]);
+        }
+    }
+
+    TEST_CASE("parallelTo") {
+        LLine l{1, 2, 7};
+        CHECK(l.parallelTo({2, 4, -3}));
+        CHECK(l.parallelTo({-3, -6, 0}));
+        CHECK_FALSE(l.parallelTo({1, 1, 1}));
     }
 }
