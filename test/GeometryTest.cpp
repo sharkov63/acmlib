@@ -552,4 +552,18 @@ TEST_SUITE("Geometry::Vector2") {
         }
         CHECK(a == Vector2<int>{2, 1});
     }
+
+    TEST_CASE("triangleArea (by two vectors)") {
+        CHECK(triangleArea<long long>({1, 0}, {0, 1}) == 0.5);
+        CHECK(triangleArea<long long>({0, 1}, {1, 0}) == 0.5);
+        CHECK(triangleArea<long long>({2, 4}, {3, 6}) == 0);
+        CHECK(triangleArea<long long>({3, 4}, {-10, 13}) == 39.5);
+    }
+
+    TEST_CASE("triangleArea (by three points)") {
+        CHECK(triangleArea<long long>({4, -4}, {5, -3}, {6, -4}) == 1);
+        CHECK(triangleArea<Real>({0.5, 6}, {11, 12}, {0.5, 6}) == 0);
+        CHECK(triangleArea<Real>({0, 0}, {3, 4}, {4, 3}) == 3.5);
+        CHECK(triangleArea<Real>({3, 4}, {0, 0}, {4, 3}) == 3.5);
+    }
 }

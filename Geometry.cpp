@@ -32,7 +32,7 @@ class Real {
     explicit operator long double() const {
         return static_cast<long double>(value);
     }
-    explicit operator int() const { return static_cast<int>(value); }
+    explicit operator int32_t() const { return static_cast<int32_t>(value); }
     explicit operator long() const { return static_cast<long>(value); }
     explicit operator long long() const {
         return static_cast<long long>(value);
@@ -160,19 +160,19 @@ template <typename T>
 class Vector2 {
    public:
     // Default constructor: zero vector.
-    Vector2<T>() : coords{0, 0} {}
+    Vector2() : coords{0, 0} {}
 
     // Construct vector by coordinates.
     template <typename P, typename Q = P>
-    Vector2<T>(P x, Q y) : coords{static_cast<T>(x), static_cast<T>(y)} {}
+    Vector2(P x, Q y) : coords{static_cast<T>(x), static_cast<T>(y)} {}
 
     // Conversion between vectors with different coordinate types.
     template <typename P>
-    Vector2<T>(Vector2<P> v)
+    Vector2(Vector2<P> v)
         : coords{static_cast<T>(v.x()), static_cast<T>(v.y())} {}
 
     // Construct vector by two endpoints.
-    explicit Vector2<T>(Point2<T> A, Point2<T> B)
+    explicit Vector2(Point2<T> A, Point2<T> B)
         : coords{B.x() - A.x(), B.y() - A.y()} {}
 
     // Access to x and y coordinates.
@@ -199,31 +199,35 @@ class Vector2 {
     Vector2<T> operator+(Vector2<T> other) const {
         return {x() + other.x(), y() + other.y()};
     }
-    void operator+=(Vector2<T> other) {
+    Vector2<T>& operator+=(Vector2<T> other) {
         x() += other.x();
         y() += other.y();
+        return *this;
     }
     Vector2<T> operator+() const { return *this; }
 
     Vector2<T> operator-(Vector2<T> other) const {
         return {x() - other.x(), y() - other.y()};
     }
-    void operator-=(Vector2<T> other) {
+    Vector2<T>& operator-=(Vector2<T> other) {
         x() -= other.x();
         y() -= other.y();
+        return *this;
     }
     Vector2<T> operator-() const { return {-x(), -y()}; }
 
     Vector2<T> operator*(T rhs) const { return {x() * rhs, y() * rhs}; }
     friend Vector2<T> operator*(T lhs, Vector2<T> rhs) { return rhs * lhs; }
-    void operator*=(T k) {
+    Vector2<T>& operator*=(T k) {
         x() *= k;
         y() *= k;
+        return *this;
     }
     Vector2<T> operator/(T rhs) const { return {x() / rhs, y() / rhs}; }
-    void operator/=(T rhs) {
+    Vector2<T>& operator/=(T rhs) {
         x() /= rhs;
         y() /= rhs;
+        return *this;
     }
 
     // Dot product
@@ -247,16 +251,18 @@ class Vector2 {
 
     // Simple rotations
 
-    void rotateCounterclockwise() {
+    Vector2<T>& rotateCounterclockwise() {
         std::swap(x(), y());
         x() *= -1;
+        return *this;
     }
 
     Vector2<T> rotatedCounterclockwise() const { return {-y(), x()}; }
 
-    void rotateClockwise() {
+    Vector2<T>& rotateClockwise() {
         std::swap(x(), y());
         y() *= -1;
+        return *this;
     }
 
     Vector2<T> rotatedClockwise() const { return {y(), -x()}; }
@@ -279,17 +285,19 @@ class Vector2 {
     std::array<T, 2> coords;
 };
 
-// Squared euclidean distance between two points.
+/// Squared euclidean distance between two points.
 template <typename T>
 T dist2(Point2<T> A, Point2<T> B) {
     return (B - A).len2();
 }
 
-// Euclidean distance between two points.
+/// Euclidean distance between two points.
 template <typename T>
 Real dist(Point2<T> A, Point2<T> B) {
     return (B - A).len();
 }
+
+/// Type aliases for vectors with T = Real.
 using RVector = Vector2<Real>;
 using RPoint = RVector;
 
@@ -320,3 +328,14 @@ normalized(Vector2<T> v) {
     return v;
 }
 
+/// Area of the triangle formed by two vectors.
+template <typename T>
+Real triangleArea(Vector2<T> a, Vector2<T> b) {
+    return fabs(a % b) * 0.5l;
+}
+
+/// Area of the triangle formed by three points.
+template <typename T>
+Real triangleArea(Point2<T> A, Point2<T> B, Point2<T> C) {
+    return triangleArea(Vector2<T>(A, B), Vector2<T>(A, C));
+}
