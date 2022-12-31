@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/danila/ACM/lib/unittest/build",
+  "command": "/usr/bin/c++  -I/home/danila/ACM/lib/unittest/..  -o CMakeFiles/acmlib-test.dir/Main.cpp.o -c /home/danila/ACM/lib/unittest/Main.cpp",
+  "file": "/home/danila/ACM/lib/unittest/Main.cpp"
+},
+{
+  "directory": "/home/danila/ACM/lib/unittest/build",
+  "command": "/usr/bin/c++  -I/home/danila/ACM/lib/unittest/..  -o CMakeFiles/acmlib-test.dir/GeometryTest.cpp.o -c /home/danila/ACM/lib/unittest/GeometryTest.cpp",
+  "file": "/home/danila/ACM/lib/unittest/GeometryTest.cpp"
+}
+]

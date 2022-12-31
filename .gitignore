@@ -1,8 +1,8 @@
-test/build
-test/compile_commands.json
-test/neovim.json
-test/.cache/
-test/.nvimrc
+unittest/build
+unittest/compile_commands.json
+unittest/neovim.json
+unittest/.cache/
+unittest/.nvimrc
 benchmark/build
 benchmark/compile_commands.json
 benchmark/neovim.json
